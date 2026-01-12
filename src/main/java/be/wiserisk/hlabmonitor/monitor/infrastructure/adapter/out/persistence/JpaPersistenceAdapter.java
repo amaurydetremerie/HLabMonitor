@@ -77,6 +77,11 @@ public class JpaPersistenceAdapter implements PersistencePort {
         return toTargetResultList(resultEntityRepository.findAllByTargetId(targetId.id()));
     }
 
+    @Override
+    public boolean exist(TargetId targetId) {
+        return targetEntityRepository.existsByTargetId(targetId.id());
+    }
+
     private List<TargetResult> toTargetResultList(List<ResultEntity> resultEntityList) {
         return resultEntityList
                 .stream()

@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TargetEntityRepository extends JpaRepository<TargetEntity, Long> {
     TargetEntity findByTargetId(String id);
+
+    boolean existsByTargetId(String targetId);
 }
