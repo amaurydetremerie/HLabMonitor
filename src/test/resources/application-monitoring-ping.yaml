@@ -1,0 +1,27 @@
+monitoring:
+  ping:
+    ping-ipv4:
+      target: 0.0.0.0
+    ping-ipv6:
+      target: 0000:0000:0000::0000
+    ping-interval-s:
+      target: 0.0.0.0
+      interval: 10s
+    ping-interval-m:
+      target: 0.0.0.0
+      interval: 10m
+    ping-interval-h:
+      target: 0.0.0.0
+      interval: 10h
+    ping-interval-d:
+      target: 0.0.0.0
+      interval: 10d
+    ping-interval-w:
+      target: 0.0.0.0
+      interval: 10w
+    ping-interval-unknown:
+      target: 0.0.0.0
+      interval: 10x
+    ping-interval-empty:
+      target: 0.0.0.0
+      interval:

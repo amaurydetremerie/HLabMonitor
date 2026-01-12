@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: Test-HLabMonitor
+logging:
+  level:
+    org.springframework: TRACE

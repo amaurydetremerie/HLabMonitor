@@ -1,0 +1,32 @@
+monitoring:
+  ping: #Ping an IPV4 or IPV6.
+    ping-google-dns-ipv4:
+      target: 8.8.8.8
+    ping-google-dns-ipv6:
+      target: 2001:4860:4860::8888
+    rapid-ping:
+      target: 1.1.1.1
+      interval: 10s
+    medium-ping:
+      target: 1.1.1.1
+      interval: 10m
+    slow-ping:
+      target: 1.1.1.1
+      interval: 1h
+    daily-ping:
+      target: 1.1.1.1
+      interval: 1d
+  http: #If ssl = false, do not use ssl. If certificate = false, do not verify certificate expiration
+    https-google-with-cert:
+      target: www.google.be
+      certificate:
+        verify: false #Default true
+        interval: 1w #Same possibility as ping interval
+    http-local-with-ssl:
+      target: www.example.local
+      interval: 1d #Same possibility as ping interval
+    https-google-without-cert:
+      target: www.google.be
+    http-local:
+      target: www.example.local
+      ssl: false #Default true

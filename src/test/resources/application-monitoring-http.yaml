@@ -1,0 +1,36 @@
+monitoring:
+  http:
+    https-with-cert-full:
+      target: www.example.com
+      interval: 1s
+      ssl: true
+      certificate:
+        verify: true
+        interval: 1s
+    https-with-cert-without-ssl:
+      target: www.example.com
+      certificate:
+        verify: true
+        interval: 1s
+    https-with-cert-verify:
+      target: www.example.com
+      certificate:
+        verify: true
+    https-with-cert-full-verify-false:
+      target: www.example.com
+      certificate:
+        verify: false
+        interval: 1s
+    http-with-cert:
+      target: www.example.com
+      ssl: false
+      certificate:
+        verify: true
+        interval: 1s
+    http-without-cert-empty:
+      target: www.example.com
+      ssl: false
+      certificate: {}
+    http-without-cert:
+      target: www.example.com
+      ssl: false

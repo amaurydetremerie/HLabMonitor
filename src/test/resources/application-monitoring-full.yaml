@@ -1,0 +1,7 @@
+monitoring:
+  ping:
+    ping-1:
+      target: 0.0.0.0
+  http:
+    http-1:
+      target: www.example.com
