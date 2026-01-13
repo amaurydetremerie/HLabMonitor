@@ -1,4 +1,4 @@
-package be.wiserisk.hlabmonitor.monitor.application.port.in.monitoring;
+package be.wiserisk.hlabmonitor.monitor.application.port.in.execution;
 
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
 

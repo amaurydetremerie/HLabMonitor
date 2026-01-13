@@ -1,8 +1,10 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.config;
 
-import be.wiserisk.hlabmonitor.monitor.application.port.in.monitoring.ExecuteCheckUseCase;
+import be.wiserisk.hlabmonitor.monitor.application.port.in.execution.ExecuteCheckUseCase;
+import be.wiserisk.hlabmonitor.monitor.application.port.in.query.GetCheckResultsUseCase;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.CheckTargetPort;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.PersistencePort;
+import be.wiserisk.hlabmonitor.monitor.domain.service.GetResultService;
 import be.wiserisk.hlabmonitor.monitor.domain.service.MonitoringService;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.HttpCheckAdapter;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.JpaPersistenceAdapter;
@@ -23,6 +25,11 @@ public class ApplicationConfig {
         return new MonitoringService(
                 checkTargetPort,
                 persistencePort);
+    }
+
+    @Bean
+    public GetCheckResultsUseCase  getCheckResultsUseCase(PersistencePort persistencePort) {
+        return new GetResultService(persistencePort);
     }
 
     @Bean

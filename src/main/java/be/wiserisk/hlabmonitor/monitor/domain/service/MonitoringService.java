@@ -1,6 +1,6 @@
 package be.wiserisk.hlabmonitor.monitor.domain.service;
 
-import be.wiserisk.hlabmonitor.monitor.application.port.in.monitoring.ExecuteCheckUseCase;
+import be.wiserisk.hlabmonitor.monitor.application.port.in.execution.ExecuteCheckUseCase;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.CheckTargetPort;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.PersistencePort;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Target;

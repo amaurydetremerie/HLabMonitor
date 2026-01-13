@@ -282,4 +282,26 @@ class HttpCheckAdapterTest {
         }
     }
 
+    @Test
+    void certCheckNoX509Cert() {
+        Target target = new Target(TARGET_ID, HTTP, TARGET);
+        URI uri = mock(URI.class);
+        URL url = mock(URL.class);
+        HttpsURLConnection hsc = mock(HttpsURLConnection.class);
+        Certificate[] certs = new Certificate[1];
+        certs[0] = mock(Certificate.class);
+
+
+        try (MockedStatic<URI> uriMockedStatic = Mockito.mockStatic(URI.class)) {
+            uriMockedStatic.when(() -> URI.create(TARGET)).thenReturn(uri);
+            when(uri.toURL()).thenReturn(url);
+            when(url.openConnection()).thenReturn(hsc);
+            doNothing().when(hsc).connect();
+            when(hsc.getServerCertificates()).thenReturn(certs);
+            assertThat(httpCheckAdapter.certCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, "No certificate found"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
