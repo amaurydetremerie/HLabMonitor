@@ -58,14 +58,14 @@ public class JpaPersistenceAdapter implements PersistencePort {
                 predicates.add(cb.lessThanOrEqualTo(root.get("to"), filter.to()));
             }
             if(filter.targetIdList() != null && !filter.targetIdList().isEmpty()) {
-                predicates.add(cb.in(root.get("targetId")).in(filter.targetIdList()));
+                predicates.add(root.get("targetId").in(filter.targetIdList()));
             }
             if(filter.monitoringResultList() != null && !filter.monitoringResultList().isEmpty()) {
-                predicates.add(cb.in(root.get("result")).in(filter.monitoringResultList()));
+                predicates.add(root.get("result").in(filter.monitoringResultList()));
             }
             //Remonter sur la target
             if(filter.monitoringTypeList() != null && !filter.monitoringTypeList().isEmpty()) {
-                predicates.add(cb.in(root.get("type")).in(filter.monitoringTypeList()));
+                predicates.add(root.get("type").in(filter.monitoringTypeList()));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
