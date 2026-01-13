@@ -15,5 +15,5 @@ public interface PersistencePort {
 
     List<TargetResult> getAllTargetResultsByTargetId(TargetId targetId);
 
-    boolean exist(TargetId targetId);
+    boolean isTargetIdExist(TargetId targetId);
 }

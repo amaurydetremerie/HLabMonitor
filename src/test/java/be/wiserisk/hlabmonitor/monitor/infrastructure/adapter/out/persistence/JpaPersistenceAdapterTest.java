@@ -83,17 +83,17 @@ class JpaPersistenceAdapterTest {
     }
 
     @Test
-    void exist() {
+    void isTargetIdExist() {
         when(targetEntityRepository.existsByTargetId(TARGET_ID_STRING)).thenReturn(true);
 
-        assertThat(jpaPersistenceAdapter.exist(TARGET_ID)).isTrue();
+        assertThat(jpaPersistenceAdapter.isTargetIdExist(TARGET_ID)).isTrue();
     }
 
     @Test
-    void notExist() {
+    void notIsTargetIdExist() {
         when(targetEntityRepository.existsByTargetId(TARGET_ID_STRING)).thenReturn(false);
 
-        assertThat(jpaPersistenceAdapter.exist(TARGET_ID)).isFalse();
+        assertThat(jpaPersistenceAdapter.isTargetIdExist(TARGET_ID)).isFalse();
     }
 
     @Test

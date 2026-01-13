@@ -24,7 +24,7 @@ public class GetResultService implements GetCheckResultsUseCase {
 
     @Override
     public List<TargetResult> getTargetIdResults(TargetId targetId) {
-        if(!persistencePort.exist(targetId)) {
+        if(!persistencePort.isTargetIdExist(targetId)) {
             //Use dedicated exception
             throw new RuntimeException("Target id not found");
         }

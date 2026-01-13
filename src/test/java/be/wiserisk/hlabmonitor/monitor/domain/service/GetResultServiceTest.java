@@ -49,7 +49,7 @@ class GetResultServiceTest {
         TargetResult targetResult = new TargetResult(TARGET_ID, SUCCESS, "");
         List<TargetResult> targetResults = List.of(targetResult);
 
-        when(persistencePort.exist(TARGET_ID)).thenReturn(true);
+        when(persistencePort.isTargetIdExist(TARGET_ID)).thenReturn(true);
         when(persistencePort.getAllTargetResultsByTargetId(TARGET_ID)).thenReturn(targetResults);
 
         assertThat(getResultService.getTargetIdResults(TARGET_ID)).isNotNull().isNotEmpty().isEqualTo(targetResults);
@@ -57,7 +57,7 @@ class GetResultServiceTest {
 
     @Test
     void getTargetIdResults_TargetIdNotFound() {
-        when(persistencePort.exist(TARGET_ID)).thenReturn(false);
+        when(persistencePort.isTargetIdExist(TARGET_ID)).thenReturn(false);
 
         assertThatThrownBy(() -> getResultService.getTargetIdResults(TARGET_ID)).isInstanceOf(RuntimeException.class);
     }

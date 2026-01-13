@@ -78,7 +78,7 @@ public class JpaPersistenceAdapter implements PersistencePort {
     }
 
     @Override
-    public boolean exist(TargetId targetId) {
+    public boolean isTargetIdExist(TargetId targetId) {
         return targetEntityRepository.existsByTargetId(targetId.id());
     }
 
