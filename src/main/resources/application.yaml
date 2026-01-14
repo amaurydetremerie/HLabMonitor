@@ -1,3 +1,6 @@
 spring:
   application:
     name: HLabMonitor
+debug:
+  controller:
+    enabled: true

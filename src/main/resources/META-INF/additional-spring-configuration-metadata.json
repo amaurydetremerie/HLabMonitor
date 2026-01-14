@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "debug.controller.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Activate the debug controller.",
+      "defaultValue": false
+    }
+  ]
+}
