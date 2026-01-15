@@ -1,0 +1,7 @@
+database:
+  type: postgresql
+  host: db.example.com
+  port: 5433
+  name: production_db
+  username: produser
+  password: prodpass

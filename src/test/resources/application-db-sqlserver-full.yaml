@@ -1,0 +1,7 @@
+database:
+  type: sqlserver
+  host: sqlserver.example.com
+  port: 14331
+  name: MonitorDB
+  username: dbadmin
+  password: AdminPassword456

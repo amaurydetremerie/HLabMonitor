@@ -1,0 +1,4 @@
+database:
+  type: sqlserver
+  username: sa
+  password: TestPassword123
