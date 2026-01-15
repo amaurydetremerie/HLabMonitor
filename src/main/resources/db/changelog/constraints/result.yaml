@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4-add-result-target-foreign-key
+      author: adetremerie
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: RESULT
+            baseColumnNames: target_id
+            constraintName: fk_result_target
+            referencedTableName: TARGET
+            referencedColumnNames: target_id
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+      rollback:
+        - dropForeignKeyConstraint:
+            baseTableName: RESULT
+            constraintName: fk_result_target

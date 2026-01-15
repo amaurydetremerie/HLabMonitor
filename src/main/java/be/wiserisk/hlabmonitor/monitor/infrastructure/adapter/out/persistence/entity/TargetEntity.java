@@ -10,12 +10,13 @@ public class TargetEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "target_id", unique = true, nullable = false)
     private String targetId;
-    @Column(nullable = false)
+    @Column(name = "target", nullable = false)
     private String target;
-    @Column(nullable = false)
+    @Column(name = "type", nullable = false)
     private String type;
 }

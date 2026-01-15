@@ -9,12 +9,13 @@ import lombok.Data;
 public class ResultEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "target_id", nullable = false)
     private String targetId;
-    @Column(nullable = false)
+    @Column(name = "result", nullable = false)
     private String result;
-    @Column(nullable = true)
+    @Column(name = "message", nullable = true)
     private String message;
 }
