@@ -10,6 +10,10 @@ on:
 jobs:
   build-packages:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package-type: [deb, rpm]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -28,19 +32,30 @@ jobs:
           path: target/
 
       - name: Install RPM build tools
+        if: matrix.package-type == 'rpm'
         run: sudo apt-get update && sudo apt-get install -y rpm
 
-      - name: Build DEB and RPM packages
-        run: |
-          mvn versions:set -DnewVersion=${{ inputs.version }} -DgenerateBackupPoms=false
-          mvn package -Plinux-packages -DskipTests
+      - name: Set Maven version
+        run: mvn versions:set -DnewVersion=${{ inputs.version }} -DgenerateBackupPoms=false
 
-      - name: Rename packages with version
-        run: |
-          mv target/*.deb target/hlabmonitor-${{ inputs.version }}.deb || true
-          mv target/rpm/hlabmonitor/RPMS/noarch/*.rpm target/hlabmonitor-${{ inputs.version }}.rpm || true
+      - name: Build DEB package
+        if: matrix.package-type == 'deb'
+        run: mvn jdeb:jdeb -Plinux-packages
+
+      - name: Build RPM package
+        if: matrix.package-type == 'rpm'
+        run: mvn rpm:rpm -Plinux-packages
+
+      - name: Rename DEB package
+        if: matrix.package-type == 'deb'
+        run: mv target/*.deb target/hlabmonitor-${{ inputs.version }}.deb
+
+      - name: Rename RPM package
+        if: matrix.package-type == 'rpm'
+        run: mv target/rpm/hlabmonitor/RPMS/noarch/*.rpm target/hlabmonitor-${{ inputs.version }}.rpm
 
       - name: Upload DEB artifact
+        if: matrix.package-type == 'deb'
         uses: actions/upload-artifact@v4
         with:
           name: deb-package
@@ -48,6 +63,7 @@ jobs:
           retention-days: 7
 
       - name: Upload RPM artifact
+        if: matrix.package-type == 'rpm'
         uses: actions/upload-artifact@v4
         with:
           name: rpm-package
