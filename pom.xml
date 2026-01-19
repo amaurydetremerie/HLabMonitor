@@ -281,16 +281,16 @@
                                 <require>systemd</require>
                             </requires>
                             <preinstallScriptlet>
-                                <scriptFile>${project.basedir}/src/rpm/scripts/preinstall.sh</scriptFile>
+                                <scriptFile>${project.basedir}/src/rpm/preinstall.sh</scriptFile>
                             </preinstallScriptlet>
                             <postinstallScriptlet>
-                                <scriptFile>${project.basedir}/src/rpm/scripts/postinstall.sh</scriptFile>
+                                <scriptFile>${project.basedir}/src/rpm/postinstall.sh</scriptFile>
                             </postinstallScriptlet>
                             <preremoveScriptlet>
-                                <scriptFile>${project.basedir}/src/rpm/scripts/preremove.sh</scriptFile>
+                                <scriptFile>${project.basedir}/src/rpm/preremove.sh</scriptFile>
                             </preremoveScriptlet>
                             <postremoveScriptlet>
-                                <scriptFile>${project.basedir}/src/rpm/scripts/postremove.sh</scriptFile>
+                                <scriptFile>${project.basedir}/src/rpm/postremove.sh</scriptFile>
                             </postremoveScriptlet>
                             <mappings>
                                 <mapping>
