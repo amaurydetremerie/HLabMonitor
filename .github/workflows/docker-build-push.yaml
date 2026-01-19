@@ -70,3 +70,11 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/hlabmonitor:buildcache-${{ matrix.variant.name }}
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/hlabmonitor:buildcache-${{ matrix.variant.name }},mode=max
+
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v5
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ${{ secrets.DOCKERHUB_USERNAME }}/hlabmonitor
+          enable-url-completion: true
