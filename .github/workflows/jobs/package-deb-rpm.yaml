@@ -33,7 +33,7 @@ jobs:
       - name: Build DEB and RPM packages
         run: |
           mvn versions:set -DnewVersion=${{ inputs.version }} -DgenerateBackupPoms=false
-          mvn package rpm:rpm jdeb:jdeb -DskipTests
+          mvn package -Plinux-packages -DskipTests
 
       - name: Rename packages with version
         run: |

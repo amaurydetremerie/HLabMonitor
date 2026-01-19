@@ -8,39 +8,28 @@ Type=exec
 User=hlabmonitor
 Group=hlabmonitor
 
-# Répertoire de travail
 WorkingDirectory=/var/lib/hlabmonitor
 
-# Commande de démarrage avec support de configuration externe
-# 1. Charge d'abord /etc/hlabmonitor/application.yaml (si présent)
-# 2. Ensuite charge le fichier défini dans HLABMONITOR_CONFIG_LOCATION (si défini)
 ExecStart=/usr/bin/java \
   -Dspring.config.additional-location=optional:file:/etc/hlabmonitor/,${HLABMONITOR_CONFIG_LOCATION} \
   -jar /usr/share/hlabmonitor/hlabmonitor.jar
 
-# Chargement des variables d'environnement
-# Debian/Ubuntu utilise /etc/default
 EnvironmentFile=-/etc/default/hlabmonitor
-# RHEL/Fedora/Rocky utilise /etc/sysconfig
 EnvironmentFile=-/etc/sysconfig/hlabmonitor
 
-# Politique de redémarrage
 Restart=always
 RestartSec=10
 SuccessExitStatus=143
 
-# Limites de ressources
 LimitNOFILE=65536
 LimitNPROC=4096
 
-# Sécurité renforcée
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
 ReadWritePaths=/var/lib/hlabmonitor /var/log/hlabmonitor
 
-# Configuration des logs
 StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=hlabmonitor

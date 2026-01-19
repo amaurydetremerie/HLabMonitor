@@ -38,6 +38,11 @@ jobs:
         run: |
           mv target/hlabmonitor-*.jar target/hlabmonitor-${{ steps.get-version.outputs.version }}.jar
 
+      - name: Make JAR executable
+        run: |
+          chmod +x target/hlabmonitor-${{ steps.get-version.outputs.version }}.jar
+          ls -lh target/hlabmonitor-${{ steps.get-version.outputs.version }}.jar
+
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
         with:
