@@ -16,4 +16,9 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Setup test directories
+        run: |
+          sudo mkdir -p /var/lib/hlabmonitor
+          sudo chown -R $USER:$USER /var/lib/hlabmonitor
+
       - run: mvn clean verify
