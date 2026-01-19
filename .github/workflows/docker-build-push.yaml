@@ -13,7 +13,27 @@ on:
         required: true
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: application-jar
+          path: target/
+
+      - name: Upload workspace
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace
+          path: .
+          retention-days: 1
+
   docker-build-push:
+    needs: prepare
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -28,14 +48,11 @@ jobs:
             dockerfile: docker/Dockerfile.corretto
             suffix: "-corretto"
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download JAR artifact
+      - name: Download workspace
         uses: actions/download-artifact@v4
         with:
-          name: application-jar
-          path: target/
+          name: workspace
+          path: .
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -70,6 +87,13 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/hlabmonitor:buildcache-${{ matrix.variant.name }}
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/hlabmonitor:buildcache-${{ matrix.variant.name }},mode=max
+
+  update-description:
+    needs: docker-build-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Docker Hub Description
         uses: peter-evans/dockerhub-description@v5
