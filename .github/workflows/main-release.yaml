@@ -6,26 +6,26 @@ on:
 
 jobs:
   build:
-    uses: ./.github/workflows/jobs/build-jar.yaml
+    uses: ./.github/workflows/build-jar.yaml
     secrets: inherit
 
   docker:
     needs: build
-    uses: ./.github/workflows/jobs/docker-build-push.yaml
+    uses: ./.github/workflows/docker-build-push.yaml
     with:
       version: ${{ needs.build.outputs.version }}
     secrets: inherit
 
   packages:
     needs: build
-    uses: ./.github/workflows/jobs/package-deb-rpm.yaml
+    uses: ./.github/workflows/package-deb-rpm.yaml
     with:
       version: ${{ needs.build.outputs.version }}
     secrets: inherit
 
   release:
     needs: [build, docker, packages]
-    uses: ./.github/workflows/jobs/publish-release.yaml
+    uses: ./.github/workflows/publish-release.yaml
     with:
       version: ${{ needs.build.outputs.version }}
     secrets: inherit
@@ -34,7 +34,7 @@ jobs:
 
   version-increment:
     needs: [build, release]
-    uses: ./.github/workflows/jobs/increment-version.yaml
+    uses: ./.github/workflows/increment-version.yaml
     with:
       current_version: ${{ needs.build.outputs.version }}
     secrets: inherit
