@@ -42,30 +42,30 @@ jobs:
 
           ### Docker
           ```bash
-          docker run -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/hlabmonitor:${{ inputs.version }}
+          docker run -d -p 8080:8080 wiserisk/hlabmonitor:${{ inputs.version }}
           ```
 
           ### Debian/Ubuntu
           ```bash
-          curl -L -o hlabmonitor.deb https://github.com/${{ github.repository }}/releases/download/v${{ inputs.version }}/hlabmonitor-${{ inputs.version }}.deb
+          curl -L -o hlabmonitor.deb https://github.com/amaurydetremerie/HLabMonitor/releases/download/v${{ inputs.version }}/hlabmonitor-${{ inputs.version }}.deb
           sudo apt install ./hlabmonitor.deb
           sudo systemctl start hlabmonitor
           ```
 
           ### RHEL/Fedora/Rocky
           ```bash
-          curl -L -o hlabmonitor.rpm https://github.com/${{ github.repository }}/releases/download/v${{ inputs.version }}/hlabmonitor-${{ inputs.version }}.rpm
-          sudo rpm -i hlabmonitor.rpm
+          curl -L -o hlabmonitor.rpm https://github.com/amaurydetremerie/HLabMonitor/releases/download/v${{ inputs.version }}/hlabmonitor-${{ inputs.version }}.rpm
+          sudo dnf install ./hlabmonitor.rpm
           sudo systemctl start hlabmonitor
           ```
 
           ### Standalone JAR
           ```bash
-          curl -L -o hlabmonitor.jar https://github.com/${{ github.repository }}/releases/download/v${{ inputs.version }}/hlabmonitor-${{ inputs.version }}.jar
+          curl -L -o hlabmonitor.jar https://github.com/amaurydetremerie/HLabMonitor/releases/download/v${{ inputs.version }}/hlabmonitor-${{ inputs.version }}.jar
           java -jar hlabmonitor.jar
           ```
 
-          📖 **Full documentation**: See [README.md](https://github.com/${{ github.repository }})
+          📖 **Full documentation**: See [README.md](https://github.com/amaurydetremerie/HLabMonitor)
 
           ---
 
@@ -74,7 +74,7 @@ jobs:
           - `hlabmonitor-${{ inputs.version }}.jar` - Executable JAR (requires Java 21+)
           - `hlabmonitor-${{ inputs.version }}.deb` - Debian/Ubuntu package
           - `hlabmonitor-${{ inputs.version }}.rpm` - RHEL/Fedora/Rocky package
-          - Docker images: `${{ secrets.DOCKERHUB_USERNAME }}/hlabmonitor:${{ inputs.version }}` (ubuntu, alpine, corretto)
+          - Docker images: `wiserisk/hlabmonitor:${{ inputs.version }}` (ubuntu, alpine, corretto)
 
           ## ⚙️ Requirements
 
