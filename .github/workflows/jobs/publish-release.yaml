@@ -1,0 +1,100 @@
+name: Publish GitHub Release
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: application-jar
+          path: artifacts/
+
+      - name: Download DEB package
+        uses: actions/download-artifact@v4
+        with:
+          name: deb-package
+          path: artifacts/
+
+      - name: Download RPM package
+        uses: actions/download-artifact@v4
+        with:
+          name: rpm-package
+          path: artifacts/
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          cat << 'EOF' > release-notes.md
+          ## 🚀 Quick Install
+
+          ### Docker
+          ```bash
+          docker run -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/hlabmonitor:${{ inputs.version }}
+          ```
+
+          ### Debian/Ubuntu
+          ```bash
+          curl -L -o hlabmonitor.deb https://github.com/${{ github.repository }}/releases/download/v${{ inputs.version }}/hlabmonitor-${{ inputs.version }}.deb
+          sudo apt install ./hlabmonitor.deb
+          sudo systemctl start hlabmonitor
+          ```
+
+          ### RHEL/Fedora/Rocky
+          ```bash
+          curl -L -o hlabmonitor.rpm https://github.com/${{ github.repository }}/releases/download/v${{ inputs.version }}/hlabmonitor-${{ inputs.version }}.rpm
+          sudo rpm -i hlabmonitor.rpm
+          sudo systemctl start hlabmonitor
+          ```
+
+          ### Standalone JAR
+          ```bash
+          curl -L -o hlabmonitor.jar https://github.com/${{ github.repository }}/releases/download/v${{ inputs.version }}/hlabmonitor-${{ inputs.version }}.jar
+          java -jar hlabmonitor.jar
+          ```
+
+          📖 **Full documentation**: See [README.md](https://github.com/${{ github.repository }})
+
+          ---
+
+          ## 📦 Assets
+
+          - `hlabmonitor-${{ inputs.version }}.jar` - Executable JAR (requires Java 21+)
+          - `hlabmonitor-${{ inputs.version }}.deb` - Debian/Ubuntu package
+          - `hlabmonitor-${{ inputs.version }}.rpm` - RHEL/Fedora/Rocky package
+          - Docker images: `${{ secrets.DOCKERHUB_USERNAME }}/hlabmonitor:${{ inputs.version }}` (ubuntu, alpine, corretto)
+
+          ## ⚙️ Requirements
+
+          - Java 21+ (JDK or JRE)
+          - Supported databases: H2, PostgreSQL, SQL Server, SQLite
+          EOF
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.version }}
+          name: Release v${{ inputs.version }}
+          draft: false
+          prerelease: false
+          body_path: release-notes.md
+          files: |
+            artifacts/*.jar
+            artifacts/*.deb
+            artifacts/*.rpm
+          generate_release_notes: true
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
