@@ -36,14 +36,14 @@ Access the Swagger UI at http://localhost:8080/swagger-ui.html
 
 Choose the installation method that best fits your environment:
 
-| Method | Best For | Documentation |
-|--------|----------|---------------|
-| 🐳 **Docker** | Quick testing, containerized environments | [Docker Guide](docs/installation/docker.md) |
+| Method | Best For | Documentation                                   |
+|--------|----------|-------------------------------------------------|
+| 🐳 **Docker** | Quick testing, containerized environments | [Docker Guide](docs/installation/docker.md)     |
 | ☸️ **Kubernetes** | Production clusters, orchestration | [Kubernetes Guide](docs/installation/kubernetes.md) |
-| 🔄 **ArgoCD** | GitOps workflows | [ArgoCD Guide](docs/installation/argocd.md) |
-| 📦 **DEB Package** | Debian/Ubuntu servers | [Debian/Ubuntu Guide](docs/installation/debian-ubuntu.md) |
-| 📦 **RPM Package** | RHEL/Fedora/Rocky servers | [RHEL/Fedora Guide](docs/installation/rhel-fedora.md) |
-| ☕ **Standalone JAR** | Any platform with Java 21+ | [JAR Guide](docs/installation/standalone-jar.md) |
+| 🔄 **ArgoCD** | GitOps workflows | [ArgoCD Guide](docs/installation/argocd.md)     |
+| 📦 **DEB Package** | Debian/Ubuntu servers | [Debian/Ubuntu Guide](docs/installation/deb.md) |
+| 📦 **RPM Package** | RHEL/Fedora/Rocky servers | [RHEL/Fedora Guide](docs/installation/rpm.md)   |
+| ☕ **Standalone JAR** | Any platform with Java 21+ | [JAR Guide](docs/installation/standalone.md)    |
 
 ## Documentation
 
@@ -102,10 +102,6 @@ docker pull wiserisk/hlabmonitor:latest-alpine
 docker pull wiserisk/hlabmonitor:latest-corretto
 ```
 
-## Upgrading
-
-See the [upgrade guide](docs/installation/upgrading.md) for version-specific migration notes.
-
 ## Support
 
 - 📖 [Documentation](docs/)
@@ -114,11 +110,13 @@ See the [upgrade guide](docs/installation/upgrading.md) for version-specific mig
 
 ## License
 
-[Your License] - See [LICENSE](LICENSE) file for details
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+
+See the [LICENSE](LICENSE) file for the full license text.
 
 ## Contributing
 
-Contributions are welcome! See [CONTRIBUTING.md](docs/development/contributing.md) for guidelines.
+Contributions are welcome! See [CONTRIBUTING](docs/development/contributing.md) for guidelines.
 
 ---
 
