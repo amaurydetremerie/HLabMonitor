@@ -1,0 +1,17 @@
+Package: [[artifactId]]
+Version: [[version]]
+Section: utils
+Priority: optional
+Architecture: all
+Depends: default-jre-headless (>= 2:1.21) | java21-runtime-headless
+Maintainer: WiseRisk <https://github.com/WiseRisk>
+Description: HLabMonitor - HomeLab Monitoring Tools
+ HLabMonitor is a complete solution to monitor your HomeLab,
+ including network, databases and various integrations.
+ .
+ Features:
+  - Real-time monitoring
+  - Support for PostgreSQL, H2, SQLite, SQL Server
+  - REST API with OpenAPI/Swagger
+  - Spring Boot Actuator integration
+  - Integrated systemd service

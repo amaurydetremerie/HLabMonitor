@@ -1,0 +1,42 @@
+name: Complete Release Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-jar.yaml
+    secrets: inherit
+
+  docker:
+    needs: build
+    uses: ./.github/workflows/docker-build-push.yaml
+    with:
+      version: ${{ needs.build.outputs.version }}
+    secrets: inherit
+
+  packages:
+    needs: build
+    uses: ./.github/workflows/package-deb-rpm.yaml
+    with:
+      version: ${{ needs.build.outputs.version }}
+    secrets: inherit
+
+  release:
+    needs: [build, docker, packages]
+    uses: ./.github/workflows/publish-release.yaml
+    with:
+      version: ${{ needs.build.outputs.version }}
+    secrets: inherit
+    permissions:
+      contents: write
+
+  version-increment:
+    needs: [build, release]
+    uses: ./.github/workflows/increment-version.yaml
+    with:
+      current_version: ${{ needs.build.outputs.version }}
+    secrets: inherit
+    permissions:
+      contents: write

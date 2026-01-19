@@ -1,0 +1,133 @@
+# ============================================================================
+# HLabMonitor - Configuration Override Example
+# ============================================================================
+#
+# Ce fichier montre des exemples de configuration qui peuvent être définis
+# dans /etc/hlabmonitor/application.yaml pour override les valeurs par défaut
+#
+# IMPORTANT: Les valeurs ci-dessous sont des EXEMPLES
+# Décommentez et modifiez uniquement ce dont vous avez besoin
+#
+# Ordre de priorité de la configuration:
+#   1. application.yaml embarqué dans le JAR (valeurs par défaut)
+#   2. /etc/hlabmonitor/application.yaml (ce fichier si renommé)
+#   3. Fichier défini dans HLABMONITOR_CONFIG_LOCATION
+#   4. Variables d'environnement dans /etc/default/hlabmonitor ou /etc/sysconfig/hlabmonitor
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# Configuration Serveur
+# ----------------------------------------------------------------------------
+#server:
+#  port: 8080
+#  address: 0.0.0.0  # Écouter sur toutes les interfaces
+#  servlet:
+#    context-path: /hlabmonitor  # Préfixe des URLs
+#  compression:
+#    enabled: true
+
+# ----------------------------------------------------------------------------
+# Configuration Base de Données
+# ----------------------------------------------------------------------------
+#spring:
+#  datasource:
+#    # PostgreSQL (recommandé en production)
+#    url: jdbc:postgresql://localhost:5432/hlabmonitor
+#    username: hlabmonitor
+#    password: changeme
+#
+#    # SQL Server
+#    #url: jdbc:sqlserver://localhost:1433;databaseName=hlabmonitor
+#    #username: hlabmonitor
+#    #password: changeme
+#
+#    # SQLite (développement/tests)
+#    #url: jdbc:sqlite:/var/lib/hlabmonitor/hlabmonitor.db
+#
+#    hikari:
+#      maximum-pool-size: 10
+#      minimum-idle: 2
+#      connection-timeout: 20000
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: validate  # Options: validate, update, create, create-drop
+#    show-sql: false
+#    properties:
+#      hibernate:
+#        format_sql: true
+#        dialect: org.hibernate.dialect.PostgreSQLDialect
+#
+#  liquibase:
+#    enabled: true
+#    change-log: classpath:db/changelog/db.changelog-master.xml
+
+# ----------------------------------------------------------------------------
+# Configuration Logging
+# ----------------------------------------------------------------------------
+#logging:
+#  level:
+#    root: INFO
+#    be.wiserisk.hlabmonitor: DEBUG
+#    org.springframework.web: DEBUG
+#    org.hibernate.SQL: DEBUG
+#    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+#
+#  file:
+#    name: /var/log/hlabmonitor/application.log
+#    max-size: 10MB
+#    max-history: 30
+#    total-size-cap: 1GB
+#
+#  pattern:
+#    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+#    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# ----------------------------------------------------------------------------
+# Spring Boot Actuator
+# ----------------------------------------------------------------------------
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: health,info,metrics,prometheus
+#      base-path: /actuator
+#  endpoint:
+#    health:
+#      show-details: when-authorized
+#  metrics:
+#    export:
+#      prometheus:
+#        enabled: true
+
+# ----------------------------------------------------------------------------
+# OpenAPI / Swagger
+# ----------------------------------------------------------------------------
+#springdoc:
+#  api-docs:
+#    path: /api-docs
+#  swagger-ui:
+#    path: /swagger-ui.html
+#    enabled: true
+
+# ----------------------------------------------------------------------------
+# Configuration HLabMonitor (propriétés métier)
+# ----------------------------------------------------------------------------
+#hlabmonitor:
+#  monitoring:
+#    enabled: true
+#    interval: 60s
+#
+#  notifications:
+#    enabled: true
+#    email:
+#      host: smtp.example.com
+#      port: 587
+#      username: hlabmonitor@example.com
+#      password: changeme
+#      from: hlabmonitor@example.com
+#      to: admin@example.com
+#
+#  storage:
+#    retention-days: 90
+#    cleanup-enabled: true

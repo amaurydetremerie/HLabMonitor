@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -e
+if ! getent passwd hlabmonitor > /dev/null; then
+    adduser --system --group --home /var/lib/hlabmonitor \
+            --no-create-home --disabled-password \
+            --gecos "HLabMonitor service user" hlabmonitor
+fi
+
+exit 0

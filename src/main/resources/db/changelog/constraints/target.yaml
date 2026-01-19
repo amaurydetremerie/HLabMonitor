@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3-add-target-unique-constraint
+      author: adetremerie
+      changes:
+        - addUniqueConstraint:
+            tableName: TARGET
+            columnNames: target_id
+            constraintName: uk_target_target_id
+      rollback:
+        - dropUniqueConstraint:
+            tableName: TARGET
+            constraintName: uk_target_target_id

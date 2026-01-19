@@ -1,0 +1,51 @@
+#!/bin/bash
+
+set -e
+
+case "$1" in
+    remove)
+        systemctl daemon-reload 2>/dev/null || true
+
+        echo ""
+        echo "HLabMonitor removed."
+        echo ""
+        echo "Note: Configuration and data files are not deleted:"
+        echo "  - /etc/hlabmonitor/"
+        echo "  - /var/lib/hlabmonitor/"
+        echo "  - /var/log/hlabmonitor/"
+        echo ""
+        echo "To completely remove files (purge):"
+        echo "  sudo apt-get purge hlabmonitor"
+        echo ""
+        ;;
+
+    purge)
+        systemctl daemon-reload 2>/dev/null || true
+
+        rm -rf /etc/hlabmonitor
+        rm -rf /var/lib/hlabmonitor
+        rm -rf /var/log/hlabmonitor
+
+        if getent passwd hlabmonitor > /dev/null; then
+            deluser --system hlabmonitor 2>/dev/null || true
+        fi
+
+        if getent group hlabmonitor > /dev/null; then
+            delgroup --system hlabmonitor 2>/dev/null || true
+        fi
+
+        echo ""
+        echo "HLabMonitor completely removed (purge)."
+        echo ""
+        ;;
+
+    upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+        ;;
+
+    *)
+        echo "postrm called with unknown argument \`$1'" >&2
+        exit 1
+        ;;
+esac
+
+exit 0

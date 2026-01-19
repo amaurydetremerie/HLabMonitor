@@ -1,0 +1,38 @@
+[Unit]
+Description=HLabMonitor - HomeLab Monitoring Service
+Documentation=https://github.com/wiserisk/hlabmonitor
+After=network.target postgresql.service
+
+[Service]
+Type=exec
+User=hlabmonitor
+Group=hlabmonitor
+
+WorkingDirectory=/var/lib/hlabmonitor
+
+ExecStart=/usr/bin/java \
+  -Dspring.config.additional-location=optional:file:/etc/hlabmonitor/,${HLABMONITOR_CONFIG_LOCATION} \
+  -jar /usr/share/hlabmonitor/hlabmonitor.jar
+
+EnvironmentFile=-/etc/default/hlabmonitor
+EnvironmentFile=-/etc/sysconfig/hlabmonitor
+
+Restart=always
+RestartSec=10
+SuccessExitStatus=143
+
+LimitNOFILE=65536
+LimitNPROC=4096
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/hlabmonitor /var/log/hlabmonitor
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=hlabmonitor
+
+[Install]
+WantedBy=multi-user.target
