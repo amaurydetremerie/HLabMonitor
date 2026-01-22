@@ -5,5 +5,5 @@ import org.springframework.integration.config.EnableIntegration;
 
 @Configuration
 @EnableIntegration
-public class IntegartionConfig {
+public class IntegrationConfig {
 }

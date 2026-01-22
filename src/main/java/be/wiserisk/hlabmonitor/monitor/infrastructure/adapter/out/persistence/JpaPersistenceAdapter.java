@@ -3,6 +3,7 @@ package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.PersistencePort;
 import be.wiserisk.hlabmonitor.monitor.domain.model.*;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.ResultEntity;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.TargetEntity;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.ResultEntityRepository;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.TargetEntityRepository;
 import jakarta.persistence.criteria.Predicate;
@@ -82,10 +83,35 @@ public class JpaPersistenceAdapter implements PersistencePort {
         return targetEntityRepository.existsByTargetId(targetId.id());
     }
 
+    @Override
+    public void updateTarget(Target target) {
+        TargetEntity targetEntity = targetEntityRepository.findByTargetId(target.id().id());
+        targetEntity.setTarget(target.target());
+        targetEntity.setType(target.type().name());
+        targetEntityRepository.save(targetEntity);
+    }
+
+    @Override
+    public void createTarget(Target target) {
+        targetEntityRepository.save(objectMapper.convertValue(target, TargetEntity.class));
+    }
+
+    @Override
+    public List<Target> getAllTargets(List<TargetId> targetIds) {
+        return toTargetList(targetEntityRepository.findByTargetIdIn(targetIds.parallelStream().map(TargetId::id).toList()));
+    }
+
     private List<TargetResult> toTargetResultList(List<ResultEntity> resultEntityList) {
         return resultEntityList
                 .stream()
                 .map(result -> objectMapper.convertValue(result, TargetResult.class))
+                .toList();
+    }
+
+    private List<Target> toTargetList(List<TargetEntity> targetEntityList) {
+        return targetEntityList
+                .stream()
+                .map(targetEntity -> objectMapper.convertValue(targetEntity, Target.class))
                 .toList();
     }
 }

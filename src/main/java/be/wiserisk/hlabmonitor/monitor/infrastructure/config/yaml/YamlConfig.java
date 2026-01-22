@@ -12,4 +12,9 @@ public class YamlConfig {
     public Monitoring monitoring() {
         return new Monitoring();
     }
+
+    @Bean
+    public MonitoringToTargetAdapter monitoringToTargetAdapter() {
+        return new MonitoringToTargetAdapter();
+    }
 }
