@@ -6,3 +6,7 @@ spring:
 logging:
   level:
     org.springframework: TRACE
+database:
+debug:
+  controller:
+    enabled: true

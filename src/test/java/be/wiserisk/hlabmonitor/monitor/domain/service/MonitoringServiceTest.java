@@ -10,6 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Duration;
+
 import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -30,7 +32,7 @@ class MonitoringServiceTest {
 
     @Test
     void executeCheckHttp() {
-        Target target = new Target(TARGET_ID, HTTP, TARGET);
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
 
         when(persistencePort.getTarget(TARGET_ID)).thenReturn(target);
 
@@ -40,7 +42,7 @@ class MonitoringServiceTest {
 
     @Test
     void executeCheckPing() {
-        Target target = new Target(TARGET_ID, PING, TARGET);
+        Target target = new Target(TARGET_ID, PING, TARGET, Duration.ofMinutes(1));
 
         when(persistencePort.getTarget(TARGET_ID)).thenReturn(target);
 
@@ -50,7 +52,7 @@ class MonitoringServiceTest {
 
     @Test
     void executeCheckCertificate() {
-        Target target = new Target(TARGET_ID, CERTIFICATE, TARGET);
+        Target target = new Target(TARGET_ID, CERTIFICATE, TARGET, Duration.ofMinutes(1));
 
         when(persistencePort.getTarget(TARGET_ID)).thenReturn(target);
 
@@ -60,7 +62,7 @@ class MonitoringServiceTest {
 
     @Test
     void executeCheckSpeedTest() {
-        Target target = new Target(TARGET_ID, SPEEDTEST, TARGET);
+        Target target = new Target(TARGET_ID, SPEEDTEST, TARGET, Duration.ofMinutes(1));
 
         when(persistencePort.getTarget(TARGET_ID)).thenReturn(target);
 
@@ -69,7 +71,7 @@ class MonitoringServiceTest {
 
     @Test
     void executeCheckUnknown() {
-        Target target = new Target(TARGET_ID, UNKNOWN, TARGET);
+        Target target = new Target(TARGET_ID, UNKNOWN, TARGET, Duration.ofMinutes(1));
 
         when(persistencePort.getTarget(TARGET_ID)).thenReturn(target);
 

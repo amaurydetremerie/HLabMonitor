@@ -17,12 +17,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import tools.jackson.databind.ObjectMapper;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult.SUCCESS;
 import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType.HTTP;
+import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType.PING;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
@@ -35,6 +37,8 @@ class JpaPersistenceAdapterTest {
     public static final TargetResult TARGET_RESULT = new TargetResult(TARGET_ID, SUCCESS, MESSAGE);
     public static final List<TargetResult> TARGET_RESULTS = List.of(TARGET_RESULT);
     public static final ResultEntity RESULT_ENTITY = new ResultEntity();
+    public static final Target TARGET = new Target(TARGET_ID, PING, "target", Duration.ofMinutes(1));
+
     @InjectMocks
     private JpaPersistenceAdapter jpaPersistenceAdapter;
 
@@ -56,7 +60,7 @@ class JpaPersistenceAdapterTest {
 
     @Test
     void getTarget() {
-        Target target = new Target(TARGET_ID, HTTP, MESSAGE);
+        Target target = new Target(TARGET_ID, HTTP, MESSAGE, Duration.ofMinutes(1));
         TargetEntity targetEntity = new TargetEntity();
 
         when(targetEntityRepository.findByTargetId(TARGET_ID_STRING)).thenReturn(targetEntity);
@@ -133,6 +137,32 @@ class JpaPersistenceAdapterTest {
         when(resultEntityRepository.findAll(argThat(new ResultEntitySpecificationMatcher(filter)), any(org.springframework.data.domain.PageRequest.class))).thenReturn(page);
 
         assertThat(jpaPersistenceAdapter.getAllResultsFilteredBy(filter, pageRequest)).isNotNull().isEqualTo(pageResponse);
+    }
+
+    @Test
+    void updateTarget() {
+        TargetEntity targetEntity = mock(TargetEntity.class);
+        when(targetEntityRepository.findByTargetId(TARGET_ID_STRING)).thenReturn(targetEntity);
+        when(targetEntityRepository.save(targetEntity)).thenReturn(targetEntity);
+        assertDoesNotThrow(() -> jpaPersistenceAdapter.updateTarget(TARGET));
+        verify(targetEntity, times(1)).setTarget(TARGET.target());
+        verify(targetEntity, times(1)).setType(TARGET.type().name());
+    }
+
+    @Test
+    void createTarget() {
+        TargetEntity targetEntity = new TargetEntity();
+        when(objectMapper.convertValue(TARGET, TargetEntity.class)).thenReturn(targetEntity);
+        assertDoesNotThrow(() -> jpaPersistenceAdapter.createTarget(TARGET));
+        verify(targetEntityRepository, times(1)).save(targetEntity);
+    }
+
+    @Test
+    void getAllTargets() {
+        TargetEntity targetEntity = new TargetEntity();
+        when(targetEntityRepository.findByTargetIdIn(List.of(TARGET_ID_STRING))).thenReturn(List.of(targetEntity));
+        when(objectMapper.convertValue(targetEntity, Target.class)).thenReturn(TARGET);
+        assertThat(jpaPersistenceAdapter.getAllTargets(List.of(TARGET_ID))).isNotNull().isEqualTo(List.of(TARGET));
     }
 
     private static class ResultEntitySpecificationMatcher implements ArgumentMatcher<Specification<ResultEntity>> {
