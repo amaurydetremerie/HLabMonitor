@@ -1,9 +1,11 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.scheduler;
 
 import be.wiserisk.hlabmonitor.monitor.application.port.out.ScheduleHandle;
+import lombok.Getter;
 
 import java.util.concurrent.ScheduledFuture;
 
+@Getter
 public class SpringScheduleHandle implements ScheduleHandle {
 
     private final String targetId;
@@ -12,11 +14,6 @@ public class SpringScheduleHandle implements ScheduleHandle {
     public SpringScheduleHandle(String targetId, ScheduledFuture<?> future) {
         this.targetId = targetId;
         this.future = future;
-    }
-
-    @Override
-    public String getTargetId() {
-        return targetId;
     }
 
     @Override

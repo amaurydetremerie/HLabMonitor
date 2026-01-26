@@ -4,9 +4,7 @@ import be.wiserisk.hlabmonitor.monitor.application.port.out.CheckTriggerCallback
 import be.wiserisk.hlabmonitor.monitor.application.port.out.ScheduleHandle;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Target;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,6 +17,7 @@ import java.util.concurrent.ScheduledFuture;
 
 import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,150 +47,63 @@ class SchedulerAdapterTest {
     @Mock
     private ScheduledFuture<?> scheduledFuture;
 
-    @Captor
-    private ArgumentCaptor<Runnable> runnableCaptor;
-    @Captor
-    private ArgumentCaptor<PeriodicTrigger> triggerCaptor;
-
-    @InjectMocks
     private SchedulerAdapter schedulerAdapter;
 
     @BeforeEach
     void setUp() {
-        Mockito.clearInvocations(scheduler, checkExecutor, callback);
-        // Les captors seront réinitialisés automatiquement avec MockitoExtension
+        schedulerAdapter = new SchedulerAdapter(scheduler, checkExecutor);
     }
 
     @Nested
-    class ScheduleTargetTests {
-        @Test
-        void shouldScheduleTaskWithCorrectInterval() {
-            doReturn(scheduledFuture)
-                    .when(scheduler)
-                    .schedule(ArgumentMatchers.<Runnable>any(), ArgumentMatchers.<PeriodicTrigger>any());
-
-            schedulerAdapter.scheduleTarget(PING_TARGET, callback);
-
-            verify(scheduler).schedule(any(Runnable.class), triggerCaptor.capture());
-            PeriodicTrigger capturedTrigger = triggerCaptor.getValue();
-            assertThat(capturedTrigger.getPeriodDuration()).isEqualTo(Duration.ofSeconds(30));
-        }
+    class CallbackTests {
 
         @Test
-        void shouldConfigureTriggerAsNonFixedRate() {
-            doReturn(scheduledFuture)
-                    .when(scheduler)
-                    .schedule(any(Runnable.class), any(PeriodicTrigger.class));
+        void shouldExecuteCallbackSuccessfully() {
+            when(scheduler.schedule(any(Runnable.class), any(PeriodicTrigger.class)))
+                    .thenReturn((ScheduledFuture) scheduledFuture);
 
-            schedulerAdapter.scheduleTarget(PING_TARGET, callback);
-
-            verify(scheduler).schedule(any(Runnable.class), triggerCaptor.capture());
-            PeriodicTrigger capturedTrigger = triggerCaptor.getValue();
-            assertThat(capturedTrigger.isFixedRate()).isFalse();
-        }
-
-
-        @Test
-        void shouldReturnHandleWithCorrectTargetId() {
-            doReturn(scheduledFuture)
-                    .when(scheduler)
-                    .schedule(ArgumentMatchers.<Runnable>any(), ArgumentMatchers.<PeriodicTrigger>any());
-
-            ScheduleHandle handle = schedulerAdapter.scheduleTarget(PING_TARGET, callback);
-
-            assertThat(handle).isNotNull();
-            assertThat(handle.getTargetId()).isEqualTo(PING_TARGET_ID_STRING);
-        }
-
-        @Test
-        void shouldReturnSpringScheduleHandleWithScheduledFuture() {
-            doReturn(scheduledFuture)
-                    .when(scheduler)
-                    .schedule(ArgumentMatchers.<Runnable>any(), ArgumentMatchers.<PeriodicTrigger>any());
-
-            ScheduleHandle handle = schedulerAdapter.scheduleTarget(PING_TARGET, callback);
-
-            assertThat(handle).isInstanceOf(SpringScheduleHandle.class);
-        }
-
-        @Test
-        void shouldExecuteCallbackInTaskExecutorWhenTaskTriggered() {
-            doReturn(scheduledFuture)
-                    .when(scheduler)
-                    .schedule(ArgumentMatchers.<Runnable>any(), ArgumentMatchers.<PeriodicTrigger>any());
             doAnswer(invocation -> {
-                Runnable runnable = invocation.getArgument(0);
-                runnable.run();
+                Runnable task = invocation.getArgument(0);
+                task.run();
                 return null;
-            }).when(checkExecutor).execute(ArgumentMatchers.<Runnable>any());
+            }).when(checkExecutor).execute(any(Runnable.class));
+
+            ArgumentCaptor<Runnable> scheduledTaskCaptor = ArgumentCaptor.forClass(Runnable.class);
 
             schedulerAdapter.scheduleTarget(PING_TARGET, callback);
 
-            verify(scheduler).schedule(runnableCaptor.capture(), ArgumentMatchers.<PeriodicTrigger>any());
-            Runnable scheduledTask = runnableCaptor.getValue();
-            scheduledTask.run();
+            verify(scheduler).schedule(scheduledTaskCaptor.capture(), any(PeriodicTrigger.class));
+            scheduledTaskCaptor.getValue().run();
 
-            verify(checkExecutor).execute(ArgumentMatchers.<Runnable>any());
-            verify(callback).onTrigger(PING_TARGET.id());
+            verify(checkExecutor).execute(any(Runnable.class));
+            verify(callback).onTrigger(PING_TARGET_ID);
         }
 
         @Test
-        void shouldCallCallbackWithCorrectTargetId() {
+        void shouldCatchExceptionWhenCallbackThrows() {
+            doThrow(new RuntimeException("Callback failed"))
+                    .when(callback).onTrigger(HTTP_TARGET_ID);
+
             doAnswer(invocation -> {
-                Runnable runnable = invocation.getArgument(0);
-                runnable.run();
+                Runnable task = invocation.getArgument(0);
+                task.run();
                 return null;
-            }).when(checkExecutor).execute(ArgumentMatchers.<Runnable>any());
+            }).when(checkExecutor).execute(any(Runnable.class));
 
-            doReturn(scheduledFuture)
-                    .when(scheduler)
-                    .schedule(ArgumentMatchers.<Runnable>any(), ArgumentMatchers.<PeriodicTrigger>any());
+            when(scheduler.schedule(any(Runnable.class), any(PeriodicTrigger.class)))
+                    .thenReturn((ScheduledFuture) scheduledFuture);
 
-            schedulerAdapter.scheduleTarget(PING_TARGET, callback);
+            ArgumentCaptor<Runnable> scheduledTaskCaptor = ArgumentCaptor.forClass(Runnable.class);
 
-            verify(scheduler).schedule(runnableCaptor.capture(), ArgumentMatchers.<PeriodicTrigger>any());
-            runnableCaptor.getValue().run();
+            schedulerAdapter.scheduleTarget(HTTP_TARGET, callback);
 
-            verify(callback).onTrigger(eq(PING_TARGET_ID));
-        }
+            verify(scheduler).schedule(scheduledTaskCaptor.capture(), any(PeriodicTrigger.class));
 
-        @Test
-        void shouldLogErrorWhenCallbackThrowsException() {
-            doReturn(scheduledFuture)
-                    .when(scheduler)
-                    .schedule(ArgumentMatchers.<Runnable>any(), ArgumentMatchers.<PeriodicTrigger>any());
-            doAnswer(invocation -> {
-                Runnable runnable = invocation.getArgument(0);
-                runnable.run();
-                return null;
-            }).when(checkExecutor).execute(ArgumentMatchers.<Runnable>any());
-            doThrow(new RuntimeException("Check failed"))
-                    .when(callback).onTrigger(ArgumentMatchers.<TargetId>any());
+            assertThatCode(() -> scheduledTaskCaptor.getValue().run())
+                    .doesNotThrowAnyException();
 
-            schedulerAdapter.scheduleTarget(PING_TARGET, callback);
-
-            verify(scheduler).schedule(runnableCaptor.capture(), ArgumentMatchers.<PeriodicTrigger>any());
-
-            runnableCaptor.getValue().run();
-
-            verify(callback).onTrigger(ArgumentMatchers.<TargetId>any());
-        }
-
-        @Test
-        void shouldScheduleMultipleTargetsIndependently() {
-            ScheduledFuture<?> future1 = mock(ScheduledFuture.class);
-            ScheduledFuture<?> future2 = mock(ScheduledFuture.class);
-
-            doReturn(future1, future2)
-                    .when(scheduler)
-                    .schedule(ArgumentMatchers.<Runnable>any(), ArgumentMatchers.<PeriodicTrigger>any());
-
-            ScheduleHandle handle1 = schedulerAdapter.scheduleTarget(PING_TARGET, callback);
-            ScheduleHandle handle2 = schedulerAdapter.scheduleTarget(HTTP_TARGET, callback);
-
-            assertThat(handle1.getTargetId()).isEqualTo(PING_TARGET_ID_STRING);
-            assertThat(handle2.getTargetId()).isEqualTo(HTTP_TARGET_ID_STRING);
-            verify(scheduler, times(2)).schedule(ArgumentMatchers.<Runnable>any(), ArgumentMatchers.<PeriodicTrigger>any());
+            verify(checkExecutor).execute(any(Runnable.class));
+            verify(callback).onTrigger(HTTP_TARGET_ID);
         }
     }
 

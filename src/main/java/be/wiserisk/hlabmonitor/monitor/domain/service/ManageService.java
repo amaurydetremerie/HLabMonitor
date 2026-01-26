@@ -93,7 +93,7 @@ public class ManageService implements ManageMonitoringConfigUseCase {
                 .toList();
     }
 
-    private void scheduleTargetMonitoring(Target target) {
+    void scheduleTargetMonitoring(Target target) {
         ScheduleHandle handle = schedulerPort.scheduleTarget(target, executeCheckUseCase::executeCheck);
         activeSchedules.put(target.id().id(), handle);
     }
