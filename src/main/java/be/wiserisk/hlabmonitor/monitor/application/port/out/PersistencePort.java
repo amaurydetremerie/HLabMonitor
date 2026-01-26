@@ -16,4 +16,10 @@ public interface PersistencePort {
     List<TargetResult> getAllTargetResultsByTargetId(TargetId targetId);
 
     boolean isTargetIdExist(TargetId targetId);
+
+    void updateTarget(Target target);
+
+    void createTarget(Target target);
+
+    List<Target> getAllTargets(List<TargetId> allActiveTargets);
 }

@@ -23,6 +23,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 
@@ -46,7 +47,7 @@ class HttpCheckAdapterTest {
     @Test
     void pingSuccess() throws IOException {
         InetAddress addressMock = mock(InetAddress.class);
-        Target target = new Target(TARGET_ID, HTTP, TARGET);
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
         when(addressMock.isReachable(5000)).thenReturn(true);
         try (MockedStatic<InetAddress> inetAddressMockedStatic = Mockito.mockStatic(InetAddress.class)) {
             inetAddressMockedStatic.when(() -> InetAddress.getByName("target")).thenReturn(addressMock);
@@ -57,7 +58,7 @@ class HttpCheckAdapterTest {
     @Test
     void pingFailure() throws IOException {
         InetAddress addressMock = mock(InetAddress.class);
-        Target target = new Target(TARGET_ID, HTTP, TARGET);
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
         when(addressMock.isReachable(5000)).thenReturn(false);
         try (MockedStatic<InetAddress> inetAddressMockedStatic = Mockito.mockStatic(InetAddress.class)) {
             inetAddressMockedStatic.when(() -> InetAddress.getByName("target")).thenReturn(addressMock);
@@ -68,7 +69,7 @@ class HttpCheckAdapterTest {
     @Test
     void pingIOException() throws IOException {
         InetAddress addressMock = mock(InetAddress.class);
-        Target target = new Target(TARGET_ID, HTTP, TARGET);
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
         doThrow(new IOException(EXCEPTION_MESSAGE)).when(addressMock).isReachable(5000);
         try (MockedStatic<InetAddress> inetAddressMockedStatic = Mockito.mockStatic(InetAddress.class)) {
             inetAddressMockedStatic.when(() -> InetAddress.getByName("target")).thenReturn(addressMock);
@@ -78,7 +79,7 @@ class HttpCheckAdapterTest {
 
     @Test
     void pingUnknownHostException() {
-        Target target = new Target(TARGET_ID, HTTP, TARGET);
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
         try (MockedStatic<InetAddress> inetAddressMockedStatic = Mockito.mockStatic(InetAddress.class)) {
             inetAddressMockedStatic.when(() -> InetAddress.getByName("target")).thenThrow(new UnknownHostException());
             assertThat(httpCheckAdapter.ping(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, "Unknown host"));
@@ -87,7 +88,7 @@ class HttpCheckAdapterTest {
 
     @Test
     void httpCheckSuccess() {
-        Target target = new Target(TARGET_ID, HTTP, TARGET);
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
         RequestHeadersUriSpec requestHeadersUriSpec = mock(RequestHeadersUriSpec.class);
         ResponseSpec responseSpec = mock(ResponseSpec.class);
 
@@ -101,7 +102,7 @@ class HttpCheckAdapterTest {
 
     @Test
     void httpCheckFailure() {
-        Target target = new Target(TARGET_ID, HTTP, TARGET);
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
         RequestHeadersUriSpec requestHeadersUriSpec = mock(RequestHeadersUriSpec.class);
         ResponseSpec responseSpec = mock(ResponseSpec.class);
 
@@ -115,7 +116,7 @@ class HttpCheckAdapterTest {
 
     @Test
     void certCheckIllegalArgumentException() {
-        Target target = new Target(TARGET_ID, HTTP, TARGET);
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
 
         try (MockedStatic<URI> uriMockedStatic = Mockito.mockStatic(URI.class)) {
             uriMockedStatic.when(() -> URI.create(TARGET)).thenThrow(new IllegalArgumentException());
@@ -125,7 +126,7 @@ class HttpCheckAdapterTest {
 
     @Test
     void certCheckMalformedURLException() {
-        Target target = new Target(TARGET_ID, HTTP, TARGET);
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
         URI uri = mock(URI.class);
 
         try (MockedStatic<URI> uriMockedStatic = Mockito.mockStatic(URI.class)) {
@@ -139,7 +140,7 @@ class HttpCheckAdapterTest {
 
     @Test
     void certCheckIOException() {
-        Target target = new Target(TARGET_ID, HTTP, TARGET);
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
         URI uri = mock(URI.class);
         URL url = mock(URL.class);
 
@@ -155,7 +156,7 @@ class HttpCheckAdapterTest {
 
     @Test
     void certCheckSocketTimeoutException() {
-        Target target = new Target(TARGET_ID, HTTP, TARGET);
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
         URI uri = mock(URI.class);
         URL url = mock(URL.class);
         HttpsURLConnection hsc = mock(HttpsURLConnection.class);
@@ -173,7 +174,7 @@ class HttpCheckAdapterTest {
 
     @Test
     void certCheckSSLPeerUnverifiedException() {
-        Target target = new Target(TARGET_ID, HTTP, TARGET);
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
         URI uri = mock(URI.class);
         URL url = mock(URL.class);
         HttpsURLConnection hsc = mock(HttpsURLConnection.class);
@@ -192,7 +193,7 @@ class HttpCheckAdapterTest {
 
     @Test
     void certCheckCertificateExpiredException() {
-        Target target = new Target(TARGET_ID, HTTP, TARGET);
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
         URI uri = mock(URI.class);
         URL url = mock(URL.class);
         HttpsURLConnection hsc = mock(HttpsURLConnection.class);
@@ -215,7 +216,7 @@ class HttpCheckAdapterTest {
 
     @Test
     void certCheckCertificateNotYetValidException() {
-        Target target = new Target(TARGET_ID, HTTP, TARGET);
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
         URI uri = mock(URI.class);
         URL url = mock(URL.class);
         HttpsURLConnection hsc = mock(HttpsURLConnection.class);
@@ -238,7 +239,7 @@ class HttpCheckAdapterTest {
 
     @Test
     void certCheck() {
-        Target target = new Target(TARGET_ID, HTTP, TARGET);
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
         URI uri = mock(URI.class);
         URL url = mock(URL.class);
         HttpsURLConnection hsc = mock(HttpsURLConnection.class);
@@ -263,7 +264,7 @@ class HttpCheckAdapterTest {
 
     @Test
     void certCheckNoCertificate() {
-        Target target = new Target(TARGET_ID, HTTP, TARGET);
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
         URI uri = mock(URI.class);
         URL url = mock(URL.class);
         HttpsURLConnection hsc = mock(HttpsURLConnection.class);
@@ -284,7 +285,7 @@ class HttpCheckAdapterTest {
 
     @Test
     void certCheckNoX509Cert() {
-        Target target = new Target(TARGET_ID, HTTP, TARGET);
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
         URI uri = mock(URI.class);
         URL url = mock(URL.class);
         HttpsURLConnection hsc = mock(HttpsURLConnection.class);

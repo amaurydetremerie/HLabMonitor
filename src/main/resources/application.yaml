@@ -16,13 +16,13 @@ management:
       enabled: true
 springdoc:
   swagger-ui:
-    enabled: true
+    enabled: false
   api-docs:
-    enabled: true
+    enabled: false
 
 
 debug:
   controller:
-    enabled: true
+    enabled: false
 database:
   type: h2
