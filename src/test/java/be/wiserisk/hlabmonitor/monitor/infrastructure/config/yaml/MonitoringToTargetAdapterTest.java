@@ -54,8 +54,8 @@ class MonitoringToTargetAdapterTest {
             List<Target> result = adapter.extractTargets(monitoring);
 
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).type()).isEqualTo(MonitoringType.HTTP);
-            assertThat(result.get(0).id().id()).isEqualTo("http1:http");
+            assertThat(result.getFirst().type()).isEqualTo(MonitoringType.HTTP);
+            assertThat(result.getFirst().id().id()).isEqualTo("http1:http");
         }
 
         @Test
@@ -81,18 +81,20 @@ class MonitoringToTargetAdapterTest {
             Map<String, Http> https = new HashMap<>();
             https.put("http1", new Http("https://example.com", Duration.ofSeconds(60), false, null));
             https.put("https1", new Http("https://secure.com", Duration.ofSeconds(60), true, cert));
+            https.put("https2", new Http("https://secure.com", Duration.ofSeconds(60), true, null));
 
             Monitoring monitoring = new Monitoring(pings, https);
 
             List<Target> result = adapter.extractTargets(monitoring);
 
-            assertThat(result).hasSize(4);
+            assertThat(result).hasSize(5);
             assertThat(result).extracting(Target::type)
                     .containsExactlyInAnyOrder(
                             PING,
                             MonitoringType.HTTP,
                             MonitoringType.HTTP,
-                            MonitoringType.CERTIFICATE
+                            MonitoringType.CERTIFICATE,
+                            MonitoringType.HTTP
                     );
         }
 

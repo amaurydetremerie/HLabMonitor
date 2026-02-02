@@ -11,6 +11,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.RequestHeadersUriSpec;
 import org.springframework.web.client.RestClient.ResponseSpec;
@@ -112,6 +113,20 @@ class HttpCheckAdapterTest {
         when(responseSpec.toBodilessEntity()).thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
         assertThat(httpCheckAdapter.httpCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, ""));
+    }
+
+    @Test
+    void httpCheckFailureResourceAccessException() {
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
+        RequestHeadersUriSpec requestHeadersUriSpec = mock(RequestHeadersUriSpec.class);
+        ResponseSpec responseSpec = mock(ResponseSpec.class);
+
+        when(restClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(TARGET)).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
+        doThrow(new ResourceAccessException("exception")).when(responseSpec.toBodilessEntity());
+
+        assertThat(httpCheckAdapter.httpCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, "exception"));
     }
 
     @Test
