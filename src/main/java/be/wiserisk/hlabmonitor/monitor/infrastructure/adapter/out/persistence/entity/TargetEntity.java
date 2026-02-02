@@ -1,11 +1,15 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "TARGET")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TargetEntity {
 
     @Id
