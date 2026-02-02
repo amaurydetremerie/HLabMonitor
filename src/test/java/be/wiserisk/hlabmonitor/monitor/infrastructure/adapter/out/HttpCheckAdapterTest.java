@@ -124,7 +124,7 @@ class HttpCheckAdapterTest {
         when(restClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(TARGET)).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
-        doThrow(new ResourceAccessException("exception")).when(responseSpec.toBodilessEntity());
+        when(responseSpec.toBodilessEntity()).thenThrow(new ResourceAccessException("exception"));
 
         assertThat(httpCheckAdapter.httpCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, "exception"));
     }
