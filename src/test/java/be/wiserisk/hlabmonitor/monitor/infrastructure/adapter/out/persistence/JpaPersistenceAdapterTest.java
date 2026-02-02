@@ -5,6 +5,8 @@ import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.en
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.TargetEntity;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.ResultEntityRepository;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.TargetEntityRepository;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper.ResultMapper;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper.TargetMapper;
 import jakarta.persistence.criteria.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import tools.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -47,12 +48,14 @@ class JpaPersistenceAdapterTest {
     @Mock
     private TargetEntityRepository targetEntityRepository;
     @Mock
-    private ObjectMapper objectMapper;
+    private TargetMapper targetMapper;
+    @Mock
+    private ResultMapper resultMapper;
 
 
     @Test
     void saveResult() {
-        when(objectMapper.convertValue(TARGET_RESULT, ResultEntity.class)).thenReturn(RESULT_ENTITY);
+        when(resultMapper.toEntity(TARGET_RESULT)).thenReturn(RESULT_ENTITY);
 
         assertDoesNotThrow(() -> jpaPersistenceAdapter.saveResult(TARGET_RESULT));
         verify(resultEntityRepository, times(1)).save(RESULT_ENTITY);
@@ -64,7 +67,7 @@ class JpaPersistenceAdapterTest {
         TargetEntity targetEntity = new TargetEntity();
 
         when(targetEntityRepository.findByTargetId(TARGET_ID_STRING)).thenReturn(targetEntity);
-        when(objectMapper.convertValue(targetEntity, Target.class)).thenReturn(target);
+        when(targetMapper.toDomain(targetEntity)).thenReturn(target);
 
         assertThat(jpaPersistenceAdapter.getTarget(TARGET_ID)).isEqualTo(target);
     }
@@ -72,7 +75,7 @@ class JpaPersistenceAdapterTest {
     @Test
     void getAllTargetResults() {
 
-        when(objectMapper.convertValue(RESULT_ENTITY, TargetResult.class)).thenReturn(TARGET_RESULT);
+        when(resultMapper.toDomain(RESULT_ENTITY)).thenReturn(TARGET_RESULT);
         when(resultEntityRepository.findAll()).thenReturn(List.of(RESULT_ENTITY));
 
         assertThat(jpaPersistenceAdapter.getAllTargetResults()).isNotNull().isNotEmpty().isEqualTo(TARGET_RESULTS);
@@ -80,7 +83,7 @@ class JpaPersistenceAdapterTest {
 
     @Test
     void getAllTargetResultsByTargetId() {
-        when(objectMapper.convertValue(RESULT_ENTITY, TargetResult.class)).thenReturn(TARGET_RESULT);
+        when(resultMapper.toDomain(RESULT_ENTITY)).thenReturn(TARGET_RESULT);
         when(resultEntityRepository.findAllByTargetId(TARGET_ID_STRING)).thenReturn(List.of(RESULT_ENTITY));
 
         assertThat(jpaPersistenceAdapter.getAllTargetResultsByTargetId(TARGET_ID)).isNotNull().isNotEmpty().isEqualTo(TARGET_RESULTS);
@@ -107,7 +110,7 @@ class JpaPersistenceAdapterTest {
         CheckResultsFilter filter = new CheckResultsFilter(LocalDateTime.MIN, LocalDateTime.MAX, List.of(TARGET_ID), List.of(SUCCESS), List.of(HTTP));
         PageRequest pageRequest = new PageRequest(0, 10);
 
-        when(objectMapper.convertValue(RESULT_ENTITY, TargetResult.class)).thenReturn(TARGET_RESULT);
+        when(resultMapper.toDomain(RESULT_ENTITY)).thenReturn(TARGET_RESULT);
         when(resultEntityRepository.findAll(argThat(new ResultEntitySpecificationMatcher(filter)), any(org.springframework.data.domain.PageRequest.class))).thenReturn(page);
 
         assertThat(jpaPersistenceAdapter.getAllResultsFilteredBy(filter, pageRequest)).isNotNull().isEqualTo(pageResponse);
@@ -120,7 +123,7 @@ class JpaPersistenceAdapterTest {
         CheckResultsFilter filter = new CheckResultsFilter(null, null, List.of(), List.of(), List.of());
         PageRequest pageRequest = new PageRequest(0, 10);
 
-        when(objectMapper.convertValue(RESULT_ENTITY, TargetResult.class)).thenReturn(TARGET_RESULT);
+        when(resultMapper.toDomain(RESULT_ENTITY)).thenReturn(TARGET_RESULT);
         when(resultEntityRepository.findAll(argThat(new ResultEntitySpecificationMatcher(filter)), any(org.springframework.data.domain.PageRequest.class))).thenReturn(page);
 
         assertThat(jpaPersistenceAdapter.getAllResultsFilteredBy(filter, pageRequest)).isNotNull().isEqualTo(pageResponse);
@@ -133,7 +136,7 @@ class JpaPersistenceAdapterTest {
         CheckResultsFilter filter = new CheckResultsFilter(null, null, null, null, null);
         PageRequest pageRequest = new PageRequest(0, 10);
 
-        when(objectMapper.convertValue(RESULT_ENTITY, TargetResult.class)).thenReturn(TARGET_RESULT);
+        when(resultMapper.toDomain(RESULT_ENTITY)).thenReturn(TARGET_RESULT);
         when(resultEntityRepository.findAll(argThat(new ResultEntitySpecificationMatcher(filter)), any(org.springframework.data.domain.PageRequest.class))).thenReturn(page);
 
         assertThat(jpaPersistenceAdapter.getAllResultsFilteredBy(filter, pageRequest)).isNotNull().isEqualTo(pageResponse);
@@ -152,7 +155,7 @@ class JpaPersistenceAdapterTest {
     @Test
     void createTarget() {
         TargetEntity targetEntity = new TargetEntity();
-        when(objectMapper.convertValue(TARGET, TargetEntity.class)).thenReturn(targetEntity);
+        when(targetMapper.toEntity(TARGET)).thenReturn(targetEntity);
         assertDoesNotThrow(() -> jpaPersistenceAdapter.createTarget(TARGET));
         verify(targetEntityRepository, times(1)).save(targetEntity);
     }
@@ -161,7 +164,7 @@ class JpaPersistenceAdapterTest {
     void getAllTargets() {
         TargetEntity targetEntity = new TargetEntity();
         when(targetEntityRepository.findByTargetIdIn(List.of(TARGET_ID_STRING))).thenReturn(List.of(targetEntity));
-        when(objectMapper.convertValue(targetEntity, Target.class)).thenReturn(TARGET);
+        when(targetMapper.toDomain(targetEntity)).thenReturn(TARGET);
         assertThat(jpaPersistenceAdapter.getAllTargets(List.of(TARGET_ID))).isNotNull().isEqualTo(List.of(TARGET));
     }
 

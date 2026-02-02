@@ -24,6 +24,10 @@ public class ManageService implements ManageMonitoringConfigUseCase {
 
     @Override
     public void syncFullConfiguration(List<Target> targetList) {
+        if (targetList.size() != targetList.stream().map(t -> t.id().id()).distinct().count()) {
+            throw new IllegalArgumentException("Duplicated target_id found");
+        }
+
         targetList.parallelStream().forEach(this::syncTarget);
         refreshMonitoredTargets(targetList);
     }

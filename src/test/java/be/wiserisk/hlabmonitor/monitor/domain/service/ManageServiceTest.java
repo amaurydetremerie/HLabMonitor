@@ -18,6 +18,7 @@ import java.time.Duration;
 import java.util.List;
 
 import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType.PING;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,6 +42,12 @@ class ManageServiceTest {
     @Spy
     @InjectMocks
     private ManageService service;
+
+    @Test
+    void syncFullConfiguration_shouldThrowErrorIfDuplicate() {
+        List<Target> targetList = List.of(TARGET, TARGET);
+        assertThrows(IllegalArgumentException.class, () -> service.syncFullConfiguration(targetList));
+    }
 
     @Test
     void syncFullConfiguration_shouldSyncEachTargetAndRefreshMonitoring() {

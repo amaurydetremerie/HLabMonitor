@@ -6,14 +6,9 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.client.RestClient;
-import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 public class CommonConfig {
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper();
-    }
 
     @Bean
     public RestClient restClient() {

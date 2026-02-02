@@ -34,3 +34,5 @@ monitoring:
     http-without-cert:
       target: www.example.com
       ssl: false
+    https-with-protocol:
+      target: https://test.com

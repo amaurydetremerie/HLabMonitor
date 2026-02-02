@@ -6,6 +6,7 @@ import be.wiserisk.hlabmonitor.monitor.domain.model.Target;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetResult;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.Common;
 import lombok.AllArgsConstructor;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -43,11 +44,15 @@ public class HttpCheckAdapter implements CheckTargetPort {
 
     @Override
     public TargetResult httpCheck(Target target) {
-        return new TargetResult(target.id(), is2xxSuccessful(target) ? SUCCESS : FAILURE, "");
+        try {
+            return new TargetResult(target.id(), is2xxSuccessful(target) ? SUCCESS : FAILURE, "");
+        } catch (ResourceAccessException e) {
+            return new TargetResult(target.id(), FAILURE, e.getMessage());
+        }
     }
 
     private boolean is2xxSuccessful(Target target) {
-        return restClient.head().uri(target.target()).retrieve().toBodilessEntity().getStatusCode().is2xxSuccessful();
+        return restClient.get().uri(target.target()).retrieve().toBodilessEntity().getStatusCode().is2xxSuccessful();
     }
 
     @Override
