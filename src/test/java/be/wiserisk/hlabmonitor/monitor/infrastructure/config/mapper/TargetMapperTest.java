@@ -39,4 +39,10 @@ class TargetMapperTest {
         assertThat(targetMapper.toDomain(targetEntity)).isNotNull().extracting("id", "type", "target").isEqualTo(List.of(new TargetId("targetId"), MonitoringType.UNKNOWN, "target"));
     }
 
+    @Test
+    void mapTargetEntityToTargetTypeRandom() {
+        TargetEntity targetEntity = new TargetEntity(1L, "targetId", "target", "RANDOM");
+        assertThat(targetMapper.toDomain(targetEntity)).isNotNull().extracting("id", "type", "target").isEqualTo(List.of(new TargetId("targetId"), MonitoringType.UNKNOWN, "target"));
+    }
+
 }

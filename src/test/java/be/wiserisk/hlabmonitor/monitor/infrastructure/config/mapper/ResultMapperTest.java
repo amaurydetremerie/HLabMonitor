@@ -38,4 +38,10 @@ class ResultMapperTest {
         assertThat(resultMapper.toDomain(resultEntity)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(new TargetId("targetId"), MonitoringResult.UNKNOWN, "message"));
     }
 
+    @Test
+    void mapResultEntityToTargetResultResultRandom() {
+        ResultEntity resultEntity = new ResultEntity(1L, "targetId", "RANDOM", "message");
+        assertThat(resultMapper.toDomain(resultEntity)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(new TargetId("targetId"), MonitoringResult.UNKNOWN, "message"));
+    }
+
 }

@@ -21,10 +21,10 @@ public interface TargetMapper {
     Target toDomain(TargetEntity e);
 
     default String map(TargetId id) {
-        return id == null ? null : id.id();
+        return id.id();
     }
     default TargetId map(String id) {
-        return id == null ? null : new TargetId(id);
+        return new TargetId(id);
     }
 
     default String map(MonitoringType type) {
