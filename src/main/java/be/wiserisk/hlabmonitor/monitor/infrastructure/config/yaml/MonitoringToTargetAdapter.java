@@ -26,7 +26,7 @@ public class MonitoringToTargetAdapter {
         }
         return pings.entrySet().stream()
                 .map(entry -> new Target(
-                        new TargetId(entry.getKey()),
+                        new TargetId(entry.getKey() + ":ping"),
                         MonitoringType.PING,
                         entry.getValue().target(),
                         entry.getValue().interval()
@@ -39,7 +39,7 @@ public class MonitoringToTargetAdapter {
         }
         return https.entrySet().stream()
                 .map(entry -> new Target(
-                        new TargetId(entry.getKey()),
+                        new TargetId(entry.getKey() + ":http"),
                         MonitoringType.HTTP,
                         entry.getValue().target(),
                         entry.getValue().interval()
@@ -52,6 +52,7 @@ public class MonitoringToTargetAdapter {
         }
         return https.entrySet().stream()
                 .filter(entry -> entry.getValue().ssl())
+                .filter(entry -> entry.getValue().certificate() != null)
                 .map(entry -> new Target(
                         new TargetId(entry.getKey() + ":certificate"),
                         MonitoringType.CERTIFICATE,

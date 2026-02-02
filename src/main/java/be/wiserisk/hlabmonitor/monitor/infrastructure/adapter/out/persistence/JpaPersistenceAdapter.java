@@ -6,12 +6,13 @@ import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.en
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.TargetEntity;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.ResultEntityRepository;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.TargetEntityRepository;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper.ResultMapper;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper.TargetMapper;
 import jakarta.persistence.criteria.Predicate;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,16 +22,17 @@ public class JpaPersistenceAdapter implements PersistencePort {
 
     ResultEntityRepository resultEntityRepository;
     TargetEntityRepository targetEntityRepository;
-    ObjectMapper objectMapper;
+    TargetMapper targetMapper;
+    ResultMapper resultMapper;
 
     @Override
     public void saveResult(TargetResult targetResult) {
-        resultEntityRepository.save(objectMapper.convertValue(targetResult, ResultEntity.class));
+        resultEntityRepository.save(resultMapper.toEntity(targetResult));
     }
 
     @Override
     public Target getTarget(TargetId targetId) {
-        return objectMapper.convertValue(targetEntityRepository.findByTargetId(targetId.id()), Target.class);
+        return targetMapper.toDomain(targetEntityRepository.findByTargetId(targetId.id()));
     }
 
     @Override
@@ -93,7 +95,7 @@ public class JpaPersistenceAdapter implements PersistencePort {
 
     @Override
     public void createTarget(Target target) {
-        targetEntityRepository.save(objectMapper.convertValue(target, TargetEntity.class));
+        targetEntityRepository.save(targetMapper.toEntity(target));
     }
 
     @Override
@@ -104,14 +106,14 @@ public class JpaPersistenceAdapter implements PersistencePort {
     private List<TargetResult> toTargetResultList(List<ResultEntity> resultEntityList) {
         return resultEntityList
                 .stream()
-                .map(result -> objectMapper.convertValue(result, TargetResult.class))
+                .map(result -> resultMapper.toDomain(result))
                 .toList();
     }
 
     private List<Target> toTargetList(List<TargetEntity> targetEntityList) {
         return targetEntityList
                 .stream()
-                .map(targetEntity -> objectMapper.convertValue(targetEntity, Target.class))
+                .map(targetEntity -> targetMapper.toDomain(targetEntity))
                 .toList();
     }
 }

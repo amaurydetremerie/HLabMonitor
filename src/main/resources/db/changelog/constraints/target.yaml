@@ -2,6 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 3-add-target-unique-constraint
       author: adetremerie
+      dbms: "!sqlite"
       changes:
         - addUniqueConstraint:
             tableName: TARGET
@@ -11,3 +12,19 @@ databaseChangeLog:
         - dropUniqueConstraint:
             tableName: TARGET
             constraintName: uk_target_target_id
+  - changeSet:
+      id: 3-add-target-unique-constraint-sqlite
+      author: adetremerie
+      dbms: sqlite
+      changes:
+        - createIndex:
+            tableName: TARGET
+            indexName: uk_target_target_id
+            unique: true
+            columns:
+              - column:
+                  name: target_id
+      rollback:
+        - dropIndex:
+            tableName: TARGET
+            indexName: uk_target_target_id

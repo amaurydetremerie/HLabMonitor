@@ -12,7 +12,16 @@ public record Http(String target, Duration interval, boolean ssl, Certificate ce
 
     @ConstructorBinding
     public Http(String target, String interval, Boolean ssl, Map<String, String> certificate) {
-        this(target, calculateInterval(interval, DEFAULT_INTERVAL), isSecured(ssl), getCertificateConfig(isSecured(ssl), certificate));
+        this(addHttpToTarget(target, isSecured(ssl)), calculateInterval(interval, DEFAULT_INTERVAL), isSecured(ssl), getCertificateConfig(isSecured(ssl), certificate));
+    }
+
+    private static String addHttpToTarget(String target, boolean secured) {
+        return secured ? "https://" + getTargetWithoutProtocol(target) : "http://" + getTargetWithoutProtocol(target);
+    }
+
+    private static String getTargetWithoutProtocol(String target) {
+        String[] split = target.split("//");
+        return split.length == 1 ? split[0] : split[1];
     }
 
     private static boolean isSecured(Boolean secured) {
@@ -20,13 +29,9 @@ public record Http(String target, Duration interval, boolean ssl, Certificate ce
     }
 
     private static Certificate getCertificateConfig(boolean secured, Map<String, String> certificate) {
-        if(certificate == null || certificate.isEmpty()) return null;
-        if(secured) {
-            if(Boolean.parseBoolean(certificate.getOrDefault("verify", Boolean.TRUE.toString()))) {
-                return new Certificate(certificate.get("interval"));
-            }
-            return new Certificate();
-        }
-        return null;
+        if(!secured) return null;
+        if(certificate == null || certificate.isEmpty()) return new Certificate();
+        if(!Boolean.parseBoolean(certificate.getOrDefault("verify", Boolean.TRUE.toString()))) return null;
+        return new Certificate(certificate.get("interval"));
     }
 }

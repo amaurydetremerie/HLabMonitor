@@ -92,7 +92,7 @@ class HttpCheckAdapterTest {
         RequestHeadersUriSpec requestHeadersUriSpec = mock(RequestHeadersUriSpec.class);
         ResponseSpec responseSpec = mock(ResponseSpec.class);
 
-        when(restClient.head()).thenReturn(requestHeadersUriSpec);
+        when(restClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(TARGET)).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.toBodilessEntity()).thenReturn(new ResponseEntity<>(HttpStatus.OK));
@@ -106,7 +106,7 @@ class HttpCheckAdapterTest {
         RequestHeadersUriSpec requestHeadersUriSpec = mock(RequestHeadersUriSpec.class);
         ResponseSpec responseSpec = mock(ResponseSpec.class);
 
-        when(restClient.head()).thenReturn(requestHeadersUriSpec);
+        when(restClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(TARGET)).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.toBodilessEntity()).thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));

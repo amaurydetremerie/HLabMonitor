@@ -8,12 +8,13 @@ import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.Jp
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.ResultEntityRepository;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.TargetEntityRepository;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.scheduler.SchedulerAdapter;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper.ResultMapper;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper.TargetMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.client.RestClient;
-import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 public class AdapterConfig {
@@ -36,11 +37,13 @@ public class AdapterConfig {
     public PersistencePort persistencePort(
             ResultEntityRepository resultEntityRepository,
             TargetEntityRepository targetEntityRepository,
-            ObjectMapper objectMapper
+            TargetMapper targetMapper,
+            ResultMapper resultMapper
     ) {
         return new JpaPersistenceAdapter(
                 resultEntityRepository,
                 targetEntityRepository,
-                objectMapper);
+                targetMapper,
+                resultMapper);
     }
 }

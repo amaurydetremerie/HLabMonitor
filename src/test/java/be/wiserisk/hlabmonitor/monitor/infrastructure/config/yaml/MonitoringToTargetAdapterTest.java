@@ -42,7 +42,7 @@ class MonitoringToTargetAdapterTest {
             assertThat(result).extracting(Target::type)
                     .containsOnly(PING);
             assertThat(result).extracting(t -> t.id().id())
-                    .containsExactlyInAnyOrder("ping1", "ping2");
+                    .containsExactlyInAnyOrder("ping1:ping", "ping2:ping");
         }
 
         @Test
@@ -55,7 +55,7 @@ class MonitoringToTargetAdapterTest {
 
             assertThat(result).hasSize(1);
             assertThat(result.get(0).type()).isEqualTo(MonitoringType.HTTP);
-            assertThat(result.get(0).id().id()).isEqualTo("http1");
+            assertThat(result.get(0).id().id()).isEqualTo("http1:http");
         }
 
         @Test
