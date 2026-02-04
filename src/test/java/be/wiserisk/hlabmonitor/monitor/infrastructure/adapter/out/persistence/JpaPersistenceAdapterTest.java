@@ -1,9 +1,10 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence;
 
-import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType;
 import be.wiserisk.hlabmonitor.monitor.domain.model.*;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.ResultEntity;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.ResultEntity_;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.TargetEntity;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.TargetEntity_;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.ResultEntityRepository;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.TargetEntityRepository;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper.ResultMapper;
@@ -21,7 +22,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -202,44 +202,52 @@ class JpaPersistenceAdapterTest {
             CriteriaQuery<ResultEntity> criteriaQuery = mock(CriteriaQuery.class);
             CriteriaBuilder criteriaBuilder = mock(CriteriaBuilder.class);
 
-            if(filter.from() != null) {
-                Path pathFrom = mock(Path.class);
-                Predicate predicateFrom = mock(Predicate.class);
-                when(root.get("from")).thenReturn(pathFrom);
-                when(criteriaBuilder.greaterThanOrEqualTo(pathFrom, filter.from())).thenReturn(predicateFrom);
-                predicates.add(predicateFrom);
-            }
+            if(filter.from() != null || filter.to() != null) {
+                Path pathCheckedAt = mock(Path.class);
+                when(root.get(ResultEntity_.checkedAt)).thenReturn(pathCheckedAt);
+                if(filter.from() != null) {
+                    Predicate predicateFrom = mock(Predicate.class);
+                    when(criteriaBuilder.greaterThanOrEqualTo(pathCheckedAt, filter.from())).thenReturn(predicateFrom);
+                    predicates.add(predicateFrom);
+                }
 
-            if(filter.to() != null) {
-                Path pathTo = mock(Path.class);
-                Predicate predicateTo = mock(Predicate.class);
-                when(root.get("to")).thenReturn(pathTo);
-                when(criteriaBuilder.lessThanOrEqualTo(pathTo, filter.to())).thenReturn(predicateTo);
-                predicates.add(predicateTo);
+                if(filter.to() != null) {
+                    Predicate predicateTo = mock(Predicate.class);
+                    when(criteriaBuilder.lessThanOrEqualTo(pathCheckedAt, filter.to())).thenReturn(predicateTo);
+                    predicates.add(predicateTo);
+                }
             }
 
             if(filter.targetIdList() != null && !filter.targetIdList().isEmpty()) {
                 Path pathTargetIdList = mock(Path.class);
                 Predicate predicateTargetIdList = mock(Predicate.class);
-                when(root.get("targetId")).thenReturn(pathTargetIdList);
+                when(root.get(ResultEntity_.targetId)).thenReturn(pathTargetIdList);
                 when(pathTargetIdList.in(filter.targetIdList())).thenReturn(predicateTargetIdList);
                 predicates.add(predicateTargetIdList);
             }
 
-            if(filter.monitoringResultList() != null && !filter.monitoringResultList().isEmpty()) {
-                Path pathMonitoringResultList = mock(Path.class);
-                Predicate predicateMonitoringResultList = mock(Predicate.class);
-                when(root.get("result")).thenReturn(pathMonitoringResultList);
-                when(pathMonitoringResultList.in(filter.monitoringResultList())).thenReturn(predicateMonitoringResultList);
-                predicates.add(predicateMonitoringResultList);
-            }
-
-            if(filter.monitoringTypeList() != null && !filter.monitoringTypeList().isEmpty()) {
+            if (filter.monitoringTypeList() != null && !filter.monitoringTypeList().isEmpty()) {
+                Subquery<Integer> subquery = mock(Subquery.class);
+                Root<TargetEntity> targetEntityRoot = mock(Root.class);
+                Expression<Integer> expression = mock(Expression.class);
+                Path pathTargetTargetId = mock(Path.class);
+                Path pathResultTargetId = mock(Path.class);
                 Path pathMonitoringTypeList = mock(Path.class);
+                Predicate equalsTargetIdPredicate = mock(Predicate.class);
                 Predicate predicateMonitoringTypeList = mock(Predicate.class);
-                when(root.get("type")).thenReturn(pathMonitoringTypeList);
+                Predicate existsPredicate = mock(Predicate.class);
+                when(criteriaQuery.subquery(Integer.class)).thenReturn(subquery);
+                when(subquery.from(TargetEntity.class)).thenReturn(targetEntityRoot);
+                when(criteriaBuilder.literal(1)).thenReturn(expression);
+                when(subquery.select(expression)).thenReturn(subquery);
+                when(targetEntityRoot.get(TargetEntity_.targetId)).thenReturn(pathTargetTargetId);
+                when(root.get(ResultEntity_.targetId)).thenReturn(pathResultTargetId);
+                when(criteriaBuilder.equal(pathTargetTargetId, pathResultTargetId)).thenReturn(equalsTargetIdPredicate);
+                when(targetEntityRoot.get(TargetEntity_.type)).thenReturn(pathMonitoringTypeList);
                 when(pathMonitoringTypeList.in(filter.monitoringTypeList())).thenReturn(predicateMonitoringTypeList);
-                predicates.add(predicateMonitoringTypeList);
+                when(subquery.where(equalsTargetIdPredicate, predicateMonitoringTypeList)).thenReturn(subquery);
+                when(criteriaBuilder.exists(subquery)).thenReturn(existsPredicate);
+                predicates.add(existsPredicate);
             }
 
             Predicate totalPredicate = mock(Predicate.class);
