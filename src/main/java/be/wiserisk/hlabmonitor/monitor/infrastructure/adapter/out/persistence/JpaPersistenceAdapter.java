@@ -1,14 +1,19 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence;
 
 import be.wiserisk.hlabmonitor.monitor.application.port.out.PersistencePort;
+import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType;
 import be.wiserisk.hlabmonitor.monitor.domain.model.*;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.ResultEntity;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.ResultEntity_;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.TargetEntity;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.TargetEntity_;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.ResultEntityRepository;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.TargetEntityRepository;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper.ResultMapper;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper.TargetMapper;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -52,23 +57,27 @@ public class JpaPersistenceAdapter implements PersistencePort {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            //Manquant dans l'entity
-            if(filter.from() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("from"), filter.from()));
+            if (filter.from() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get(ResultEntity_.checkedAt), filter.from()));
             }
-            //Manquant dans l'entity
-            if(filter.to() != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("to"), filter.to()));
+            if (filter.to() != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get(ResultEntity_.checkedAt), filter.to()));
             }
             if(filter.targetIdList() != null && !filter.targetIdList().isEmpty()) {
-                predicates.add(root.get("targetId").in(filter.targetIdList()));
+                predicates.add(root.get(ResultEntity_.targetId).in(filter.targetIdList().stream().map(TargetId::id).toList()));
             }
             if(filter.monitoringResultList() != null && !filter.monitoringResultList().isEmpty()) {
-                predicates.add(root.get("result").in(filter.monitoringResultList()));
+                predicates.add(root.get(ResultEntity_.result).in(filter.monitoringResultList().stream().map(Enum::name).toList()));
             }
-            //Remonter sur la target
-            if(filter.monitoringTypeList() != null && !filter.monitoringTypeList().isEmpty()) {
-                predicates.add(root.get("type").in(filter.monitoringTypeList()));
+            if (filter.monitoringTypeList() != null && !filter.monitoringTypeList().isEmpty()) {
+                Subquery<Integer> subquery = query.subquery(Integer.class);
+                Root<TargetEntity> targetEntityRoot = subquery.from(TargetEntity.class);
+                subquery.select(cb.literal(1))
+                    .where(
+                        cb.equal(targetEntityRoot.get(TargetEntity_.targetId), root.get(ResultEntity_.targetId)),
+                        targetEntityRoot.get(TargetEntity_.type).in(filter.monitoringTypeList().stream().map(Enum::name).toList())
+                    );
+                predicates.add(cb.exists(subquery));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
@@ -101,6 +110,20 @@ public class JpaPersistenceAdapter implements PersistencePort {
     @Override
     public List<Target> getAllTargets(List<TargetId> targetIds) {
         return toTargetList(targetEntityRepository.findByTargetIdIn(targetIds.parallelStream().map(TargetId::id).toList()));
+    }
+
+    @Override
+    public List<TargetId> getAllTargetIds() {
+        return toTargetIdList(targetEntityRepository.findAll());
+    }
+
+    @Override
+    public List<TargetId> getAllTargetIdsByMonitoringType(MonitoringType monitoringType) {
+        return toTargetIdList(targetEntityRepository.findAllByType(monitoringType.name()));
+    }
+
+    private List<TargetId> toTargetIdList(List<TargetEntity> targetEntityList) {
+        return targetEntityList.stream().map(t -> new TargetId(t.getTargetId())).toList();
     }
 
     private List<TargetResult> toTargetResultList(List<ResultEntity> resultEntityList) {

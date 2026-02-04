@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/data/beforeTableChange/target.yaml
+  - include:
+      file: db/changelog/data/beforeConstraintChange/result.yaml

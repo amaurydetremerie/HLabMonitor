@@ -4,9 +4,13 @@ import be.wiserisk.hlabmonitor.monitor.application.port.out.CheckTriggerCallback
 import be.wiserisk.hlabmonitor.monitor.application.port.out.ScheduleHandle;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Target;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -181,21 +185,21 @@ class SchedulerAdapterTest {
         void shouldAllowScheduleThenUnschedule() {
             doReturn(scheduledFuture)
                     .when(scheduler)
-                    .schedule(ArgumentMatchers.<Runnable>any(), ArgumentMatchers.<PeriodicTrigger>any());
+                    .schedule(ArgumentMatchers.any(), ArgumentMatchers.<PeriodicTrigger>any());
             when(scheduledFuture.isCancelled()).thenReturn(false);
             when(scheduledFuture.isDone()).thenReturn(false);
 
             ScheduleHandle handle = schedulerAdapter.scheduleTarget(PING_TARGET, callback);
             schedulerAdapter.unschedule(handle);
 
-            verify(scheduler).schedule(ArgumentMatchers.<Runnable>any(), ArgumentMatchers.<PeriodicTrigger>any());
+            verify(scheduler).schedule(ArgumentMatchers.any(), ArgumentMatchers.<PeriodicTrigger>any());
             verify(scheduledFuture).cancel(false);
         }
 
         @Test
         void shouldHandleDifferentMonitoringTypes() {
             ScheduledFuture<?> future = mock(ScheduledFuture.class);
-            doReturn(future).when(scheduler).schedule(ArgumentMatchers.<Runnable>any(), ArgumentMatchers.<PeriodicTrigger>any());
+            doReturn(future).when(scheduler).schedule(ArgumentMatchers.any(), ArgumentMatchers.<PeriodicTrigger>any());
 
             ScheduleHandle handle1 = schedulerAdapter.scheduleTarget(PING_TARGET, callback);
             ScheduleHandle handle2 = schedulerAdapter.scheduleTarget(HTTP_TARGET, callback);
@@ -204,7 +208,7 @@ class SchedulerAdapterTest {
             assertThat(handle1.getTargetId()).isEqualTo(PING_TARGET_ID_STRING);
             assertThat(handle2.getTargetId()).isEqualTo(HTTP_TARGET_ID_STRING);
             assertThat(handle3.getTargetId()).isEqualTo(CERT_TARGET_ID_STRING);
-            verify(scheduler, times(3)).schedule(ArgumentMatchers.<Runnable>any(), ArgumentMatchers.<PeriodicTrigger>any());
+            verify(scheduler, times(3)).schedule(ArgumentMatchers.any(), ArgumentMatchers.<PeriodicTrigger>any());
         }
     }
 }

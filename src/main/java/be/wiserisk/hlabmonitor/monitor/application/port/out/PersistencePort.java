@@ -1,5 +1,6 @@
 package be.wiserisk.hlabmonitor.monitor.application.port.out;
 
+import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType;
 import be.wiserisk.hlabmonitor.monitor.domain.model.*;
 
 import java.util.List;
@@ -22,4 +23,8 @@ public interface PersistencePort {
     void createTarget(Target target);
 
     List<Target> getAllTargets(List<TargetId> allActiveTargets);
+
+    List<TargetId> getAllTargetIds();
+
+    List<TargetId> getAllTargetIdsByMonitoringType(MonitoringType monitoringType);
 }

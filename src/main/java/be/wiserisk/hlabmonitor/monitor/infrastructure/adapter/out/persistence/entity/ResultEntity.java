@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
 @Entity
 @Table(name = "RESULT")
 @Data
@@ -22,4 +24,6 @@ public class ResultEntity {
     private String result;
     @Column(name = "message", nullable = true)
     private String message;
+    @Column(name = "checked_at", nullable = false)
+    private Instant checkedAt;
 }
