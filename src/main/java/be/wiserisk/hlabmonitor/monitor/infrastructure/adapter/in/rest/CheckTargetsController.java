@@ -1,11 +1,8 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.in.rest;
 
-import be.wiserisk.hlabmonitor.monitor.application.port.in.query.GetCheckResultsUseCase;
 import be.wiserisk.hlabmonitor.monitor.application.port.in.query.GetCheckTargetIdsUseCase;
 import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType;
-import be.wiserisk.hlabmonitor.monitor.domain.model.Target;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
-import be.wiserisk.hlabmonitor.monitor.domain.model.TargetResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;

@@ -1,10 +1,9 @@
 package be.wiserisk.hlabmonitor.monitor.domain.service;
 
-import be.wiserisk.hlabmonitor.monitor.application.port.in.query.GetCheckResultsUseCase;
 import be.wiserisk.hlabmonitor.monitor.application.port.in.query.GetCheckTargetIdsUseCase;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.PersistencePort;
 import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType;
-import be.wiserisk.hlabmonitor.monitor.domain.model.*;
+import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
 import lombok.AllArgsConstructor;
 
 import java.util.List;

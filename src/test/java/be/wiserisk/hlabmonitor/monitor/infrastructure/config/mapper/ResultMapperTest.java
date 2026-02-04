@@ -7,7 +7,6 @@ import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.en
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
