@@ -208,9 +208,9 @@ class JpaPersistenceAdapterTest {
                     (filter.monitoringResultList() != null && !filter.monitoringResultList().isEmpty()) ||
                     (filter.monitoringTypeList() != null && !filter.monitoringTypeList().isEmpty())) {
                 Path pathResultEntity_ = mock(Path.class);
-                when(root.get(ResultEntity_.checkedAt)).thenReturn(pathResultEntity_);
 
                 if (filter.from() != null || filter.to() != null) {
+                    when(root.get(ResultEntity_.checkedAt)).thenReturn(pathResultEntity_);
                     if (filter.from() != null) {
                         Predicate predicateFrom = mock(Predicate.class);
                         when(criteriaBuilder.greaterThanOrEqualTo(pathResultEntity_, filter.from())).thenReturn(predicateFrom);
@@ -226,12 +226,14 @@ class JpaPersistenceAdapterTest {
 
                 if (filter.targetIdList() != null && !filter.targetIdList().isEmpty()) {
                     Predicate predicateTargetIdList = mock(Predicate.class);
+                    when(root.get(ResultEntity_.targetId)).thenReturn(pathResultEntity_);
                     when(pathResultEntity_.in(filter.targetIdList().stream().map(TargetId::id).toList())).thenReturn(predicateTargetIdList);
                     predicates.add(predicateTargetIdList);
                 }
 
                 if (filter.monitoringResultList() != null && !filter.monitoringResultList().isEmpty()) {
                     Predicate predicateMonitoringResultList = mock(Predicate.class);
+                    when(root.get(ResultEntity_.result)).thenReturn(pathResultEntity_);
                     when(pathResultEntity_.in(filter.monitoringResultList().stream().map(Enum::name).toList())).thenReturn(predicateMonitoringResultList);
                     predicates.add(predicateMonitoringResultList);
                 }
