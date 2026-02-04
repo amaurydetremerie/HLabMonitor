@@ -23,8 +23,13 @@ jobs:
       version: ${{ needs.build.outputs.version }}
     secrets: inherit
 
+  openapi:
+    uses: ./.github/workflows/generate-openapi.yaml
+    secrets: inherit
+
+
   release:
-    needs: [build, docker, packages]
+    needs: [build, docker, packages, openapi]
     uses: ./.github/workflows/publish-release.yaml
     with:
       version: ${{ needs.build.outputs.version }}
