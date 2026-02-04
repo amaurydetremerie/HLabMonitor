@@ -241,6 +241,8 @@ class JpaPersistenceAdapterTest {
                     Root<TargetEntity> targetEntityRoot = mock(Root.class);
                     Expression<Integer> expression = mock(Expression.class);
                     Path pathTargetEntity_ = mock(Path.class);
+                    when(targetEntityRoot.get(TargetEntity_.targetId)).thenReturn(pathTargetEntity_);
+                    when(targetEntityRoot.get(TargetEntity_.type)).thenReturn(pathTargetEntity_);
                     Predicate equalsTargetIdPredicate = mock(Predicate.class);
                     Predicate predicateMonitoringTypeList = mock(Predicate.class);
                     Predicate existsPredicate = mock(Predicate.class);
@@ -248,7 +250,6 @@ class JpaPersistenceAdapterTest {
                     when(subquery.from(TargetEntity.class)).thenReturn(targetEntityRoot);
                     when(criteriaBuilder.literal(1)).thenReturn(expression);
                     when(subquery.select(expression)).thenReturn(subquery);
-                    when(targetEntityRoot.get(TargetEntity_.targetId)).thenReturn(pathTargetEntity_);
                     when(criteriaBuilder.equal(pathTargetEntity_, pathResultEntity_)).thenReturn(equalsTargetIdPredicate);
                     when(pathTargetEntity_.in(filter.monitoringTypeList().stream().map(Enum::name).toList())).thenReturn(predicateMonitoringTypeList);
                     when(subquery.where(equalsTargetIdPredicate, predicateMonitoringTypeList)).thenReturn(subquery);
