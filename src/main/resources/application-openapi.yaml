@@ -1,0 +1,11 @@
+spring:
+  liquibase:
+    enabled: false
+springdoc:
+  api-docs:
+    enabled: true
+database:
+  type: h2
+debug:
+  controller:
+    enabled: true
