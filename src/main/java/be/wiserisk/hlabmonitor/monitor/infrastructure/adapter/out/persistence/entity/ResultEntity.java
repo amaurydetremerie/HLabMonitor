@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "RESULT")
@@ -22,4 +26,6 @@ public class ResultEntity {
     private String result;
     @Column(name = "message", nullable = true)
     private String message;
+    @Column(name = "checked_at", nullable = false)
+    private Instant checkedAt;
 }

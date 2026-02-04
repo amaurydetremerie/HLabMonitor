@@ -32,3 +32,19 @@ databaseChangeLog:
       rollback:
         - dropTable:
             tableName: RESULT
+  - changeSet:
+      id: 5-add-result-checked-at
+      author: adetremerie
+      changes:
+        - addColumn:
+            tableName: RESULT
+            columns:
+              - column:
+                  name: checked_at
+                  type: timestamp
+                  constraints:
+                    nullable: true
+      rollback:
+        - dropColumn:
+            tableName: RESULT
+            columnName: checked_at

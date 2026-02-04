@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult.FAILURE;
@@ -68,8 +69,8 @@ class GetResultServiceTest {
         List<TargetResult> targetResults = List.of(targetResult);
 
         CheckResultsFilter filter = new CheckResultsFilter(
-                LocalDateTime.of(LocalDate.of(2026, 1, 1), LocalTime.MIDNIGHT),
-                LocalDateTime.of(LocalDate.of(2026, 12, 31), LocalTime.MIDNIGHT),
+                LocalDateTime.of(LocalDate.of(2026, 1, 1), LocalTime.MIDNIGHT).toInstant(ZoneOffset.UTC),
+                LocalDateTime.of(LocalDate.of(2026, 12, 31), LocalTime.MIDNIGHT).toInstant(ZoneOffset.UTC),
                 List.of(TARGET_ID),
                 List.of(SUCCESS, FAILURE),
                 List.of(HTTP, PING, CERTIFICATE, SPEEDTEST));

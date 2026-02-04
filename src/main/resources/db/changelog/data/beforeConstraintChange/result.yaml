@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 6-backfill-results-checkedAt
+      author: adetremerie
+      changes:
+        - update:
+            tableName: RESULT
+            columns:
+              - column:
+                  name: checked_at
+                  valueComputed: CURRENT_TIMESTAMP
+      rollback:
+        - update:
+            tableName: RESULT
+            columns:
+              - column:
+                  name: checked_at
+                  value: NULL
+            where: checked_at IS NOT NULL

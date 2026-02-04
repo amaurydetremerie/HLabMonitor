@@ -1,5 +1,6 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence;
 
+import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType;
 import be.wiserisk.hlabmonitor.monitor.domain.model.*;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.ResultEntity;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.TargetEntity;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +54,23 @@ class JpaPersistenceAdapterTest {
     @Mock
     private ResultMapper resultMapper;
 
+    @Test
+    void getAllTargetIds() {
+        TargetEntity targetEntity = new TargetEntity();
+        targetEntity.setTargetId(TARGET_ID_STRING);
+        when(targetEntityRepository.findAll()).thenReturn(List.of(targetEntity));
+
+        assertThat(jpaPersistenceAdapter.getAllTargetIds()).isNotNull().containsExactly(TARGET_ID);
+    }
+
+    @Test
+    void getAllTargetIdsByMonitoringType() {
+        TargetEntity targetEntity = new TargetEntity();
+        targetEntity.setTargetId(TARGET_ID_STRING);
+        when(targetEntityRepository.findAllByType(PING.name())).thenReturn(List.of(targetEntity));
+
+        assertThat(jpaPersistenceAdapter.getAllTargetIdsByMonitoringType(PING)).isNotNull().containsExactly(TARGET_ID);
+    }
 
     @Test
     void saveResult() {
@@ -107,7 +126,7 @@ class JpaPersistenceAdapterTest {
     void getAllResultsFilteredBy() {
         PageImpl<ResultEntity> page = new PageImpl<>(List.of(RESULT_ENTITY), Pageable.ofSize(10), 1);
         PageResponse<TargetResult> pageResponse = new PageResponse<>(TARGET_RESULTS, 0, 10, 1, false);
-        CheckResultsFilter filter = new CheckResultsFilter(LocalDateTime.MIN, LocalDateTime.MAX, List.of(TARGET_ID), List.of(SUCCESS), List.of(HTTP));
+        CheckResultsFilter filter = new CheckResultsFilter(Instant.MIN, Instant.MAX, List.of(TARGET_ID), List.of(SUCCESS), List.of(HTTP));
         PageRequest pageRequest = new PageRequest(0, 10);
 
         when(resultMapper.toDomain(RESULT_ENTITY)).thenReturn(TARGET_RESULT);

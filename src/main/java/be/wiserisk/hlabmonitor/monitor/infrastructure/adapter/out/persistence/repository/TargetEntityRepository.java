@@ -14,4 +14,6 @@ public interface TargetEntityRepository extends JpaRepository<TargetEntity, Long
     boolean existsByTargetId(String targetId);
 
     List<TargetEntity> findByTargetIdIn(Collection<String> targetIds);
+
+    List<TargetEntity> findAllByType(String type);
 }

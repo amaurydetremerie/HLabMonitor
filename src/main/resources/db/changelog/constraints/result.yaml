@@ -109,3 +109,115 @@ databaseChangeLog:
               FROM RESULT_fk;
         - dropTable:
             tableName: RESULT_fk
+  - changeSet:
+      id: 7-add-checked-at-not-null
+      author: adetremerie
+      dbms: "!sqlite"
+      changes:
+        - addNotNullConstraint:
+            tableName: RESULT
+            columnName: checked_at
+            columnDataType: timestamp
+  - changeSet:
+      id: 7-add-checked-at-not-null-sqlite-rebuild
+      author: adetremerie
+      dbms: sqlite
+      preConditions:
+        - onFail: HALT
+        - onError: HALT
+        - sqlCheck:
+            expectedResult: "0"
+            sql: |
+              SELECT COUNT(*)
+              FROM RESULT r
+              LEFT JOIN TARGET t ON t.target_id = r.target_id
+              WHERE t.target_id IS NULL;
+      changes:
+        - renameTable:
+            oldTableName: RESULT
+            newTableName: RESULT_old
+        - createTable:
+            tableName: RESULT
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_result
+                    nullable: false
+              - column:
+                  name: target_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    referencedTableName: TARGET
+                    referencedColumnNames: target_id
+                    foreignKeyName: fk_result_target
+                    deleteCascade: true
+              - column:
+                  name: result
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: message
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: checked_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+        - sql:
+            sql: |
+              INSERT INTO RESULT (id, target_id, result, message, checked_at)
+              SELECT id, target_id, result, message, checked_at
+              FROM RESULT_old;
+        - dropTable:
+            tableName: RESULT_old
+      rollback:
+        - renameTable:
+            oldTableName: RESULT
+            newTableName: RESULT_checked_at_nullable
+
+        - createTable:
+            tableName: RESULT
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_result
+                    nullable: false
+              - column:
+                  name: target_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: result
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: message
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: checked_at
+                  type: timestamp
+                  constraints:
+                    nullable: true
+        - sql:
+            sql: |
+              INSERT INTO RESULT (id, target_id, result, message, checked_at)
+              SELECT id, target_id, result, message, checked_at
+              FROM RESULT_checked_at_nullable;
+        - dropTable:
+            tableName: RESULT_checked_at_nullable

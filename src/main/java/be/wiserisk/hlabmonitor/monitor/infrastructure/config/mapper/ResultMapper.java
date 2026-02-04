@@ -13,10 +13,12 @@ public interface ResultMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "targetId", source = "id")
     @Mapping(target = "result", source = "result")
+    @Mapping(target = "checkedAt", source = "checkedAt")
     ResultEntity toEntity(TargetResult t);
 
     @Mapping(target = "id", source = "targetId")
     @Mapping(target = "result", source = "result")
+    @Mapping(target = "checkedAt", source = "checkedAt")
     TargetResult toDomain(ResultEntity e);
 
     default String map(TargetId id) {
