@@ -1,5 +1,6 @@
 package be.wiserisk.hlabmonitor.monitor.application.port.out;
 
+import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult;
 import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType;
 import be.wiserisk.hlabmonitor.monitor.domain.model.*;
 
@@ -27,4 +28,12 @@ public interface PersistencePort {
     List<TargetId> getAllTargetIds();
 
     List<TargetId> getAllTargetIdsByMonitoringType(MonitoringType monitoringType);
+
+    Long countTarget();
+
+    Long countTarget(MonitoringType monitoringType);
+
+    Long countLast24hResults();
+
+    Long countLast24hResults(MonitoringResult monitoringResult);
 }
