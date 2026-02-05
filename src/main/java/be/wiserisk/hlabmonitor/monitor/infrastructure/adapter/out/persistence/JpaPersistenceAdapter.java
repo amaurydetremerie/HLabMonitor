@@ -1,6 +1,7 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence;
 
 import be.wiserisk.hlabmonitor.monitor.application.port.out.PersistencePort;
+import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult;
 import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType;
 import be.wiserisk.hlabmonitor.monitor.domain.model.*;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.ResultEntity;
@@ -19,6 +20,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,6 +123,26 @@ public class JpaPersistenceAdapter implements PersistencePort {
     @Override
     public List<TargetId> getAllTargetIdsByMonitoringType(MonitoringType monitoringType) {
         return toTargetIdList(targetEntityRepository.findAllByType(monitoringType.name()));
+    }
+
+    @Override
+    public Long countTarget() {
+        return targetEntityRepository.count();
+    }
+
+    @Override
+    public Long countTarget(MonitoringType monitoringType) {
+        return targetEntityRepository.countByType(monitoringType.name());
+    }
+
+    @Override
+    public Long countLast24hResults() {
+        return resultEntityRepository.countByCheckedAtGreaterThanEqual(Instant.now().minus(Duration.ofHours(24)));
+    }
+
+    @Override
+    public Long countLast24hResults(MonitoringResult monitoringResult) {
+        return resultEntityRepository.countByResultAndCheckedAtGreaterThanEqual(monitoringResult.name(), Instant.now().minus(Duration.ofHours(24)));
     }
 
     private List<TargetId> toTargetIdList(List<TargetEntity> targetEntityList) {

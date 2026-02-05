@@ -16,4 +16,6 @@ public interface TargetEntityRepository extends JpaRepository<TargetEntity, Long
     List<TargetEntity> findByTargetIdIn(Collection<String> targetIds);
 
     List<TargetEntity> findAllByType(String type);
+
+    Long countByType(String type);
 }

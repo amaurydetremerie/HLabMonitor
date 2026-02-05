@@ -3,14 +3,12 @@ package be.wiserisk.hlabmonitor.monitor.infrastructure.config;
 import be.wiserisk.hlabmonitor.monitor.application.port.in.execution.ExecuteCheckUseCase;
 import be.wiserisk.hlabmonitor.monitor.application.port.in.management.ManageMonitoringConfigUseCase;
 import be.wiserisk.hlabmonitor.monitor.application.port.in.query.GetCheckResultsUseCase;
+import be.wiserisk.hlabmonitor.monitor.application.port.in.query.GetCheckStatisticsUseCase;
 import be.wiserisk.hlabmonitor.monitor.application.port.in.query.GetCheckTargetIdsUseCase;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.CheckTargetPort;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.MonitoringSchedulerPort;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.PersistencePort;
-import be.wiserisk.hlabmonitor.monitor.domain.service.GetResultService;
-import be.wiserisk.hlabmonitor.monitor.domain.service.GetTargetIdService;
-import be.wiserisk.hlabmonitor.monitor.domain.service.ManageService;
-import be.wiserisk.hlabmonitor.monitor.domain.service.MonitoringService;
+import be.wiserisk.hlabmonitor.monitor.domain.service.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -42,5 +40,10 @@ public class UseCaseConfig {
     @Bean
     public GetCheckTargetIdsUseCase getCheckTargetIdsUseCase(PersistencePort persistencePort) {
         return new GetTargetIdService(persistencePort);
+    }
+
+    @Bean
+    public GetCheckStatisticsUseCase getCheckStatisticsUseCase(PersistencePort persistencePort) {
+        return new GetStatisticsService(persistencePort);
     }
 }

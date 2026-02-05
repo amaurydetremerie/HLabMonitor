@@ -187,6 +187,34 @@ class JpaPersistenceAdapterTest {
         assertThat(jpaPersistenceAdapter.getAllTargets(List.of(TARGET_ID))).isNotNull().isEqualTo(List.of(TARGET));
     }
 
+    @Test
+    void countTarget() {
+        when(targetEntityRepository.count()).thenReturn(1L);
+
+        assertThat(jpaPersistenceAdapter.countTarget()).isEqualTo(1L);
+    }
+
+    @Test
+    void countTargetAndType() {
+        when(targetEntityRepository.countByType("PING")).thenReturn(1L);
+
+        assertThat(jpaPersistenceAdapter.countTarget(PING)).isEqualTo(1L);
+    }
+
+    @Test
+    void countLast24hResults() {
+        when(resultEntityRepository.countByCheckedAtGreaterThanEqual(any(Instant.class))).thenReturn(1L);
+
+        assertThat(jpaPersistenceAdapter.countLast24hResults()).isEqualTo(1L);
+    }
+
+    @Test
+    void countLast24hResultsAndResult() {
+        when(resultEntityRepository.countByResultAndCheckedAtGreaterThanEqual(eq("SUCCESS"), any(Instant.class))).thenReturn(1L);
+
+        assertThat(jpaPersistenceAdapter.countLast24hResults(SUCCESS)).isEqualTo(1L);
+    }
+
     private static class ResultEntitySpecificationMatcher implements ArgumentMatcher<Specification<ResultEntity>> {
         private final CheckResultsFilter filter;
 

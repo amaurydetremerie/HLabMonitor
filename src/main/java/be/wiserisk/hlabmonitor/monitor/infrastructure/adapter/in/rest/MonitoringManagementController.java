@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/targets")
+@RequestMapping("/api/v1/management")
 @AllArgsConstructor
 @Tag(name = "Manage Targets")
 public class MonitoringManagementController {
