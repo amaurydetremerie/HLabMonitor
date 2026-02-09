@@ -9,7 +9,10 @@ import be.wiserisk.hlabmonitor.monitor.domain.exception.UnsupportedEnumException
 import be.wiserisk.hlabmonitor.monitor.domain.model.Statistics;
 import lombok.AllArgsConstructor;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

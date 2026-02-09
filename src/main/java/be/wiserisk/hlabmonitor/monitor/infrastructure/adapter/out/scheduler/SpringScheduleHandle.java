@@ -1,7 +1,6 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.scheduler;
 
 import be.wiserisk.hlabmonitor.monitor.application.port.out.ScheduleHandle;
-import lombok.Getter;
 
 import java.util.concurrent.ScheduledFuture;
 
