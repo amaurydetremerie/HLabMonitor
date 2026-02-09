@@ -1,6 +1,5 @@
 package be.wiserisk.hlabmonitor.monitor.domain.service;
 
-import be.wiserisk.hlabmonitor.monitor.application.port.in.query.GetCheckStatisticsUseCase;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.PersistencePort;
 import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult;
 import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType;

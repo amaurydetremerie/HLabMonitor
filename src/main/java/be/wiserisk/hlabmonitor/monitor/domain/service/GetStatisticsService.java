@@ -6,7 +6,7 @@ import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult;
 import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType;
 import be.wiserisk.hlabmonitor.monitor.domain.enums.StatisticType;
 import be.wiserisk.hlabmonitor.monitor.domain.exception.UnsupportedEnumException;
-import be.wiserisk.hlabmonitor.monitor.domain.model.*;
+import be.wiserisk.hlabmonitor.monitor.domain.model.Statistics;
 import lombok.AllArgsConstructor;
 
 import java.util.Arrays;
@@ -16,7 +16,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static be.wiserisk.hlabmonitor.monitor.domain.enums.StatisticType.*;
+import static be.wiserisk.hlabmonitor.monitor.domain.enums.StatisticType.GENERAL;
+import static be.wiserisk.hlabmonitor.monitor.domain.enums.StatisticType.values;
 
 @AllArgsConstructor
 public class GetStatisticsService implements GetCheckStatisticsUseCase {
