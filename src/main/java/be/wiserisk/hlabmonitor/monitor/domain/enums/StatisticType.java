@@ -15,4 +15,5 @@ public enum StatisticType {
     TARGET_SPEEDTEST,
     NOTIFICATION_SEND,
     NOTIFICATION_TRIGGER,
+    UNKNOWN
 }
