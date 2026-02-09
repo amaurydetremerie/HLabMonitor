@@ -2,6 +2,7 @@ package be.wiserisk.hlabmonitor.monitor.domain.service;
 
 import be.wiserisk.hlabmonitor.monitor.application.port.in.query.GetCheckResultsUseCase;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.PersistencePort;
+import be.wiserisk.hlabmonitor.monitor.domain.exception.TargetNotFoundException;
 import be.wiserisk.hlabmonitor.monitor.domain.model.*;
 import lombok.AllArgsConstructor;
 
@@ -25,8 +26,7 @@ public class GetResultService implements GetCheckResultsUseCase {
     @Override
     public List<TargetResult> getTargetIdResults(TargetId targetId) {
         if(!persistencePort.isTargetIdExist(targetId)) {
-            //Use dedicated exception
-            throw new RuntimeException("Target id not found");
+            throw new TargetNotFoundException(targetId);
         }
         return persistencePort.getAllTargetResultsByTargetId(targetId);
     }

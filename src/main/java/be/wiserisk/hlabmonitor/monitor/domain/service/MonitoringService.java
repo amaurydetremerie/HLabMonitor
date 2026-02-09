@@ -3,6 +3,7 @@ package be.wiserisk.hlabmonitor.monitor.domain.service;
 import be.wiserisk.hlabmonitor.monitor.application.port.in.execution.ExecuteCheckUseCase;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.CheckTargetPort;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.PersistencePort;
+import be.wiserisk.hlabmonitor.monitor.domain.exception.UnsupportedEnumException;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Target;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetResult;
@@ -25,8 +26,7 @@ public class MonitoringService implements ExecuteCheckUseCase {
             case HTTP -> getTarget(target);
             case CERTIFICATE -> verifyCert(target);
             case SPEEDTEST -> throw new UnsupportedOperationException("Not supported yet.");
-            //Use dedicated Exception
-            default -> throw new RuntimeException("Unsupported target type: " + target.type());
+            default -> throw new UnsupportedEnumException(target.type());
         };
     }
 

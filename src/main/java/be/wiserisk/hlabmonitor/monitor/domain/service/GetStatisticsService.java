@@ -5,6 +5,7 @@ import be.wiserisk.hlabmonitor.monitor.application.port.out.PersistencePort;
 import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult;
 import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType;
 import be.wiserisk.hlabmonitor.monitor.domain.enums.StatisticType;
+import be.wiserisk.hlabmonitor.monitor.domain.exception.UnsupportedEnumException;
 import be.wiserisk.hlabmonitor.monitor.domain.model.*;
 import lombok.AllArgsConstructor;
 
@@ -53,7 +54,7 @@ public class GetStatisticsService implements GetCheckStatisticsUseCase {
             case TARGET_SPEEDTEST -> persistencePort.countTarget(MonitoringType.SPEEDTEST);
             case NOTIFICATION_SEND -> -1L;
             case NOTIFICATION_TRIGGER -> -1L;
-            default -> throw new UnsupportedOperationException("Unsupported statistic type: " + statisticType);
+            default -> throw new UnsupportedEnumException(statisticType);
         };
     }
 }
