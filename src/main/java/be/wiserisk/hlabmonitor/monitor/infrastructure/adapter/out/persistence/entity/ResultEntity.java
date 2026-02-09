@@ -22,7 +22,7 @@ public class ResultEntity {
     private String targetId;
     @Column(name = "result", nullable = false)
     private String result;
-    @Column(name = "message", nullable = true)
+    @Column(name = "message")
     private String message;
     @Column(name = "checked_at", nullable = false)
     private Instant checkedAt;

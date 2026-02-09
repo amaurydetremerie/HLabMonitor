@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ResultMapperTest {
 
     public static final Instant NOW = Instant.now();
-    ResultMapper resultMapper = new ResultMapperImpl();
+    final ResultMapper resultMapper = new ResultMapperImpl();
 
     @Test
     void mapTargetResultToResultEntity() {

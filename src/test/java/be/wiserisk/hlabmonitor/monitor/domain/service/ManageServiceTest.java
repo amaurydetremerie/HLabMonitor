@@ -218,7 +218,7 @@ class ManageServiceTest {
         ScheduleHandle oldHandle = mock(ScheduleHandle.class);
         ScheduleHandle newHandle = mock(ScheduleHandle.class);
 
-        when(oldHandle.getTargetId()).thenReturn(TARGET_ID_STRING);
+        when(oldHandle.targetId()).thenReturn(TARGET_ID_STRING);
         when(schedulerPort.scheduleTarget(eq(TARGET), any(CheckTriggerCallback.class)))
                 .thenReturn(oldHandle)
                 .thenReturn(newHandle);

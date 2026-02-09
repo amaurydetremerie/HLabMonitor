@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class TargetMapperTest {
 
-    TargetMapper targetMapper = new TargetMapperImpl();
+    final TargetMapper targetMapper = new TargetMapperImpl();
 
     @Test
     void mapTargetToTargetEntity() {

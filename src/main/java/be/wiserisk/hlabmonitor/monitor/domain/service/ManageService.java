@@ -93,7 +93,7 @@ public class ManageService implements ManageMonitoringConfigUseCase {
     private List<TargetId> getAllActiveTargets() {
         return activeSchedules.values()
                 .parallelStream()
-                .map(ScheduleHandle::getTargetId)
+                .map(ScheduleHandle::targetId)
                 .map(TargetId::new)
                 .toList();
     }

@@ -12,8 +12,7 @@ public class DebugConfig {
     @Bean
     @ConditionalOnProperty(
             name = "debug.controller.enabled",
-            havingValue = "true",
-            matchIfMissing = false
+            havingValue = "true"
     )
     public ExecuteCheckController executeCheckController(ExecuteCheckUseCase executeCheckUseCase) {
         return new ExecuteCheckController(executeCheckUseCase);
