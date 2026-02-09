@@ -5,6 +5,7 @@ import be.wiserisk.hlabmonitor.monitor.application.port.out.CheckTriggerCallback
 import be.wiserisk.hlabmonitor.monitor.application.port.out.MonitoringSchedulerPort;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.PersistencePort;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.ScheduleHandle;
+import be.wiserisk.hlabmonitor.monitor.domain.exception.TargetDuplicatedException;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Target;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ class ManageServiceTest {
     @Test
     void syncFullConfiguration_shouldThrowErrorIfDuplicate() {
         List<Target> targetList = List.of(TARGET, TARGET);
-        assertThrows(IllegalArgumentException.class, () -> service.syncFullConfiguration(targetList));
+        assertThrows(TargetDuplicatedException.class, () -> service.syncFullConfiguration(targetList));
     }
 
     @Test
@@ -217,7 +218,7 @@ class ManageServiceTest {
         ScheduleHandle oldHandle = mock(ScheduleHandle.class);
         ScheduleHandle newHandle = mock(ScheduleHandle.class);
 
-        when(oldHandle.getTargetId()).thenReturn(TARGET_ID_STRING);
+        when(oldHandle.targetId()).thenReturn(TARGET_ID_STRING);
         when(schedulerPort.scheduleTarget(eq(TARGET), any(CheckTriggerCallback.class)))
                 .thenReturn(oldHandle)
                 .thenReturn(newHandle);

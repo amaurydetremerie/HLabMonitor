@@ -162,8 +162,7 @@ class MonitoringToTargetAdapterTest {
 
             List<Target> result = adapter.extractTargets(new Monitoring(pings, null));
 
-            assertThat(result).hasSize(2);
-            assertThat(result).allMatch(t -> t.type() == PING);
+            assertThat(result).hasSize(2).allMatch(t -> t.type() == PING);
         }
     }
 

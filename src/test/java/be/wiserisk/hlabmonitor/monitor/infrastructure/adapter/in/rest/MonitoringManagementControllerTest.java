@@ -51,7 +51,7 @@ class MonitoringManagementControllerTest {
 
         ResponseEntity<Void> response = controller.updateTarget(TARGET);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
         assertThat(response.getBody()).isNull();
         verify(manageConfigUseCase, times(1)).updateAndRefreshExistingTarget(TARGET);
     }
@@ -62,7 +62,7 @@ class MonitoringManagementControllerTest {
 
         ResponseEntity<Void> response = controller.stopMonitoring(TARGET_ID_STRING);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
         assertThat(response.getBody()).isNull();
         verify(manageConfigUseCase, times(1)).stopMonitoring(TARGET_ID);
     }
@@ -73,7 +73,7 @@ class MonitoringManagementControllerTest {
 
         ResponseEntity<Void> response = controller.resumeMonitoring(TARGET_ID_STRING);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
         assertThat(response.getBody()).isNull();
         verify(manageConfigUseCase, times(1)).resumeMonitoring(TARGET_ID);
     }
@@ -84,7 +84,7 @@ class MonitoringManagementControllerTest {
 
         ResponseEntity<Void> response = controller.reloadConfiguration();
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
         assertThat(response.getBody()).isNull();
         verify(manageConfigUseCase, times(1)).reloadAllMonitoring();
     }

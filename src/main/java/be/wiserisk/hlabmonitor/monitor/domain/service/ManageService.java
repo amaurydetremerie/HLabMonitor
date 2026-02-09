@@ -5,6 +5,7 @@ import be.wiserisk.hlabmonitor.monitor.application.port.in.management.ManageMoni
 import be.wiserisk.hlabmonitor.monitor.application.port.out.MonitoringSchedulerPort;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.PersistencePort;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.ScheduleHandle;
+import be.wiserisk.hlabmonitor.monitor.domain.exception.TargetDuplicatedException;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Target;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,7 @@ public class ManageService implements ManageMonitoringConfigUseCase {
     @Override
     public void syncFullConfiguration(List<Target> targetList) {
         if (targetList.size() != targetList.stream().map(t -> t.id().id()).distinct().count()) {
-            throw new IllegalArgumentException("Duplicated target_id found");
+            throw new TargetDuplicatedException();
         }
 
         targetList.parallelStream().forEach(this::syncTarget);
@@ -92,7 +93,7 @@ public class ManageService implements ManageMonitoringConfigUseCase {
     private List<TargetId> getAllActiveTargets() {
         return activeSchedules.values()
                 .parallelStream()
-                .map(ScheduleHandle::getTargetId)
+                .map(ScheduleHandle::targetId)
                 .map(TargetId::new)
                 .toList();
     }

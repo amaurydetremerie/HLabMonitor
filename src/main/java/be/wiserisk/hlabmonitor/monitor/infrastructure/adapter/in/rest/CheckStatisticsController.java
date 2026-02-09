@@ -1,17 +1,18 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.in.rest;
 
-import be.wiserisk.hlabmonitor.monitor.application.port.in.management.ManageMonitoringConfigUseCase;
 import be.wiserisk.hlabmonitor.monitor.application.port.in.query.GetCheckStatisticsUseCase;
 import be.wiserisk.hlabmonitor.monitor.domain.enums.StatisticType;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Statistics;
-import be.wiserisk.hlabmonitor.monitor.domain.model.Target;
-import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -24,6 +25,13 @@ public class CheckStatisticsController {
     private final GetCheckStatisticsUseCase getCheckStatisticsUseCase;
 
     @Operation(summary = "Some statistics about target")
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Statistics.class)
+            )
+    )
     @GetMapping("/stats")
     public Statistics getStatistics(@RequestParam(required = false) List<StatisticType> statisticTypes) {
         return getCheckStatisticsUseCase.getStatistics(statisticTypes);

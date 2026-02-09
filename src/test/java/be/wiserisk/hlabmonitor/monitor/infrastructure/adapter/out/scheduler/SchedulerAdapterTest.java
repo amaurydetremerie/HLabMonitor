@@ -205,9 +205,9 @@ class SchedulerAdapterTest {
             ScheduleHandle handle2 = schedulerAdapter.scheduleTarget(HTTP_TARGET, callback);
             ScheduleHandle handle3 = schedulerAdapter.scheduleTarget(CERT_TARGET, callback);
 
-            assertThat(handle1.getTargetId()).isEqualTo(PING_TARGET_ID_STRING);
-            assertThat(handle2.getTargetId()).isEqualTo(HTTP_TARGET_ID_STRING);
-            assertThat(handle3.getTargetId()).isEqualTo(CERT_TARGET_ID_STRING);
+            assertThat(handle1.targetId()).isEqualTo(PING_TARGET_ID_STRING);
+            assertThat(handle2.targetId()).isEqualTo(HTTP_TARGET_ID_STRING);
+            assertThat(handle3.targetId()).isEqualTo(CERT_TARGET_ID_STRING);
             verify(scheduler, times(3)).schedule(ArgumentMatchers.any(), ArgumentMatchers.<PeriodicTrigger>any());
         }
     }
