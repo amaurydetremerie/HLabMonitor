@@ -16,8 +16,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static be.wiserisk.hlabmonitor.monitor.domain.enums.StatisticType.GENERAL;
-import static be.wiserisk.hlabmonitor.monitor.domain.enums.StatisticType.values;
+import static be.wiserisk.hlabmonitor.monitor.domain.enums.StatisticType.*;
 
 @AllArgsConstructor
 public class GetStatisticsService implements GetCheckStatisticsUseCase {
@@ -37,7 +36,7 @@ public class GetStatisticsService implements GetCheckStatisticsUseCase {
     }
 
     private Map<StatisticType, Long> getAllStatistics() {
-        return Arrays.stream(values()).filter(s -> !s.equals(GENERAL)).collect(Collectors.toMap(Function.identity(), this::getStatisticsFor));
+        return Arrays.stream(values()).filter(s -> !s.equals(GENERAL) && !s.equals(UNKNOWN)).collect(Collectors.toMap(Function.identity(), this::getStatisticsFor));
     }
 
     private Long getStatisticsFor(StatisticType statisticType) {

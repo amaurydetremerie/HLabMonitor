@@ -46,7 +46,7 @@ class GetStatisticsServiceTest {
 
     @Test
     void getUNKNOWNStatistics() {
-        List<StatisticType> statisticTypes = List.of(StatisticType.TARGET);
+        List<StatisticType> statisticTypes = List.of(StatisticType.UNKNOWN);
         assertThatThrownBy(() -> getStatisticsService.getStatistics(statisticTypes)).isInstanceOf(UnsupportedEnumException.class);
     }
 
