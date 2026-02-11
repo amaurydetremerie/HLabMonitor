@@ -24,11 +24,11 @@ class InstantEpochMillisConverterTest {
 
     @Test
     void convertToDatabaseColumnNull() {
-        assertThat(instantEpochMillisConverter.convertToDatabaseColumn(null)).isNotNull().isEqualTo(null);
+        assertThat(instantEpochMillisConverter.convertToDatabaseColumn(null)).isNull();
     }
 
     @Test
     void convertToEntityAttributeNull() {
-        assertThat(instantEpochMillisConverter.convertToEntityAttribute(null)).isNotNull().isEqualTo(null);
+        assertThat(instantEpochMillisConverter.convertToEntityAttribute(null)).isNull();
     }
 }
