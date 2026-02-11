@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class InstantEpochMillisConverterTest {
 
@@ -21,5 +20,15 @@ class InstantEpochMillisConverterTest {
     @Test
     void convertToEntityAttribute() {
         assertThat(instantEpochMillisConverter.convertToEntityAttribute(EPOCH_MILLI)).isNotNull().isEqualTo(INSTANT);
+    }
+
+    @Test
+    void convertToDatabaseColumnNull() {
+        assertThat(instantEpochMillisConverter.convertToDatabaseColumn(null)).isNotNull().isEqualTo(null);
+    }
+
+    @Test
+    void convertToEntityAttributeNull() {
+        assertThat(instantEpochMillisConverter.convertToEntityAttribute(null)).isNotNull().isEqualTo(null);
     }
 }
