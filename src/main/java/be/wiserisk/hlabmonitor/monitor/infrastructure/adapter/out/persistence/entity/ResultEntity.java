@@ -1,5 +1,6 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity;
 
+import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.converter.InstantEpochMillisConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,5 +26,6 @@ public class ResultEntity {
     @Column(name = "message")
     private String message;
     @Column(name = "checked_at", nullable = false)
+    @Convert(converter = InstantEpochMillisConverter.class)
     private Instant checkedAt;
 }

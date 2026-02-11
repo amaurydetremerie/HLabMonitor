@@ -102,6 +102,7 @@ public class DataSourceConfig {
         properties.put("hibernate.hbm2ddl.auto", "none");
         properties.put("hibernate.dialect", databaseProperties.type().hibernateDialect);
         properties.put("hibernate.show_sql", "true");
+        properties.put("hibernate.format_sql", "true");
 
         em.setJpaPropertyMap(properties);
         em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
