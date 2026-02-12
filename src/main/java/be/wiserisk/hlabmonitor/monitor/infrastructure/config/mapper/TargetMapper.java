@@ -13,10 +13,12 @@ public interface TargetMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "targetId", source = "id")
     @Mapping(target = "type", source = "type")
+    @Mapping(target = "acceptableStatusCode", source = "acceptableStatusCode")
     TargetEntity toEntity(Target t);
 
     @Mapping(target = "id", source = "targetId")
     @Mapping(target = "type", source = "type")
+    @Mapping(target = "acceptableStatusCode", source = "acceptableStatusCode")
     @Mapping(target = "interval", ignore = true)
     Target toDomain(TargetEntity e);
 

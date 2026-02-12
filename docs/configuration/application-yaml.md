@@ -142,12 +142,13 @@ HTTP checks verify web service availability and response.
 
 #### Properties
 
-| Property | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
-| `target` | string | Yes | - | URL or hostname to check (protocol auto-detected based on `ssl`) |
-| `interval` | duration | No | `10m` | Check interval (supports `s`, `m`, `h`, `d`, `w` suffixes) |
-| `ssl` | boolean | No | `true` | Enable HTTPS (true) or HTTP (false) |
-| `certificate` | object | No | - | SSL certificate monitoring configuration (see below) |
+| Property       | Type    | Required | Default | Description                                                      |
+|----------------|---------|----------|---------|------------------------------------------------------------------|
+| `target`       | string  | Yes | -       | URL or hostname to check (protocol auto-detected based on `ssl`) |
+| `interval`     | duration | No | `10m`   | Check interval (supports `s`, `m`, `h`, `d`, `w` suffixes)       |
+| `status-code`  | integer | No | -| Status code other than 2xx when target is up                     |
+| `ssl`          | boolean | No | `true`  | Enable HTTPS (true) or HTTP (false)                              |
+| `certificate`  | object  | No | -       | SSL certificate monitoring configuration (see below)             |
 
 #### Example
 
@@ -163,6 +164,10 @@ monitoring:
       target: api.internal.local
       interval: 1m
       ssl: false
+    
+    secured:
+      target: api.internal.local
+      status-code: 401
     
     service:
       target: service.example.com

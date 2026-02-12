@@ -102,6 +102,7 @@ public class JpaPersistenceAdapter implements PersistencePort {
         TargetEntity targetEntity = targetEntityRepository.findByTargetId(target.id().id());
         targetEntity.setTarget(target.target());
         targetEntity.setType(target.type().name());
+        targetEntity.setAcceptableStatusCode(target.acceptableStatusCode());
         targetEntityRepository.save(targetEntity);
     }
 

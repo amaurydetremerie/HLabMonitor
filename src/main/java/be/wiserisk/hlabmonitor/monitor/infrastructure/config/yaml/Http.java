@@ -7,12 +7,12 @@ import java.util.Map;
 
 import static be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.Common.calculateInterval;
 
-public record Http(String target, Duration interval, boolean ssl, Certificate certificate) implements Common {
+public record Http(String target, Duration interval, boolean ssl, Certificate certificate, Integer statusCode) implements Common {
     public static final Duration DEFAULT_INTERVAL = Duration.ofMinutes(10L);
 
     @ConstructorBinding
-    public Http(String target, String interval, Boolean ssl, Map<String, String> certificate) {
-        this(addHttpToTarget(target, isSecured(ssl)), calculateInterval(interval, DEFAULT_INTERVAL), isSecured(ssl), getCertificateConfig(isSecured(ssl), certificate));
+    public Http(String target, String interval, Boolean ssl, Map<String, String> certificate, Integer statusCode) {
+        this(addHttpToTarget(target, isSecured(ssl)), calculateInterval(interval, DEFAULT_INTERVAL), isSecured(ssl), getCertificateConfig(isSecured(ssl), certificate), statusCode);
     }
 
     private static String addHttpToTarget(String target, boolean secured) {

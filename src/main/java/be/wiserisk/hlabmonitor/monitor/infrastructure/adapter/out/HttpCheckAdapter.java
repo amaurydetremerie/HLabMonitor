@@ -6,6 +6,7 @@ import be.wiserisk.hlabmonitor.monitor.domain.model.Target;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetResult;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.Common;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 
@@ -18,8 +19,7 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 
-import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult.FAILURE;
-import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult.SUCCESS;
+import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult.*;
 
 @AllArgsConstructor
 public class HttpCheckAdapter implements CheckTargetPort {
@@ -32,9 +32,9 @@ public class HttpCheckAdapter implements CheckTargetPort {
             InetAddress inetAddress = InetAddress.getByName(target.target());
             return new TargetResult(target.id(), getPingResult(inetAddress),"");
         } catch (UnknownHostException e) {
-            return new TargetResult(target.id(), FAILURE, "Unknown host");
+            return new TargetResult(target.id(), WARNING, "Unknown host");
         } catch (IOException e) {
-            return new TargetResult(target.id(), FAILURE, e.getMessage());
+            return new TargetResult(target.id(), ERROR, e.getMessage());
         }
     }
 
@@ -45,14 +45,22 @@ public class HttpCheckAdapter implements CheckTargetPort {
     @Override
     public TargetResult httpCheck(Target target) {
         try {
-            return new TargetResult(target.id(), is2xxSuccessful(target) ? SUCCESS : FAILURE, "");
+            HttpStatusCode httpStatusCode = getStatusCode(target);
+            if((target.acceptableStatusCode() != null && httpStatusCode.value() == target.acceptableStatusCode())
+                    || httpStatusCode.is2xxSuccessful())
+                return new TargetResult(target.id(), SUCCESS, "HTTP call success: status=" + httpStatusCode.value());
+            if(httpStatusCode.is1xxInformational() || httpStatusCode.is3xxRedirection())
+                return new TargetResult(target.id(), WARNING, "HTTP call warning: status=" + httpStatusCode.value());
+            if(httpStatusCode.is4xxClientError() || httpStatusCode.is5xxServerError())
+                return new TargetResult(target.id(), FAILURE, "HTTP call failed: status=" + httpStatusCode.value());
+            return new TargetResult(target.id(), UNKNOWN, "HTTP call unknown: status=" + httpStatusCode.value());
         } catch (ResourceAccessException e) {
-            return new TargetResult(target.id(), FAILURE, e.getMessage());
+            return new TargetResult(target.id(), ERROR, e.getMessage());
         }
     }
 
-    private boolean is2xxSuccessful(Target target) {
-        return restClient.get().uri(target.target()).retrieve().toBodilessEntity().getStatusCode().is2xxSuccessful();
+    private HttpStatusCode getStatusCode(Target target) {
+        return restClient.get().uri(target.target()).retrieve().toBodilessEntity().getStatusCode();
     }
 
     @Override
@@ -70,18 +78,18 @@ public class HttpCheckAdapter implements CheckTargetPort {
             }
             conn.disconnect();
         } catch (IllegalArgumentException|MalformedURLException e) {
-            return new TargetResult(target.id(), FAILURE, "Malformed URL");
+            return new TargetResult(target.id(), WARNING, "Malformed URL");
         } catch (SSLPeerUnverifiedException e) {
-            return new TargetResult(target.id(), FAILURE, "Peer unverified");
+            return new TargetResult(target.id(), WARNING, "Peer unverified");
         } catch (SocketTimeoutException e) {
-            return new TargetResult(target.id(), FAILURE, "Timeout");
+            return new TargetResult(target.id(), WARNING, "Timeout");
         } catch (CertificateNotYetValidException e) {
             return new TargetResult(target.id(), FAILURE, "Certificate not yet valid");
         } catch (CertificateExpiredException e) {
             return new TargetResult(target.id(), FAILURE, "Certificate expired");
         } catch (IOException e) {
-            return new TargetResult(target.id(), FAILURE, e.getMessage());
+            return new TargetResult(target.id(), ERROR, e.getMessage());
         }
-        return new TargetResult(target.id(), FAILURE, "No certificate found");
+        return new TargetResult(target.id(), ERROR, "No certificate found");
     }
 }

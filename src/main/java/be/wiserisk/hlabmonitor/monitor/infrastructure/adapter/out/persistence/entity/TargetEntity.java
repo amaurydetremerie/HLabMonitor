@@ -23,4 +23,6 @@ public class TargetEntity {
     private String target;
     @Column(name = "type", nullable = false)
     private String type;
+    @Column(name = "acceptable_status_code")
+    private Integer acceptableStatusCode;
 }

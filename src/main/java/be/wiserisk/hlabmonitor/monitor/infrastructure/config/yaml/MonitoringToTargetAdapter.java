@@ -42,7 +42,8 @@ public class MonitoringToTargetAdapter {
                         new TargetId(entry.getKey() + ":http"),
                         MonitoringType.HTTP,
                         entry.getValue().target(),
-                        entry.getValue().interval()
+                        entry.getValue().interval(),
+                        entry.getValue().statusCode()
                 ));
     }
 

@@ -4,6 +4,14 @@ monitoring:
       target: www.example.com
       interval: 1s
       ssl: true
+      status-code: 302
+      certificate:
+        verify: true
+        interval: 1s
+    https-with-cert-full-without-status-code:
+      target: www.example.com
+      interval: 1s
+      ssl: true
       certificate:
         verify: true
         interval: 1s
