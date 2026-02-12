@@ -115,6 +115,62 @@ class HttpCheckAdapterTest {
     }
 
     @Test
+    void httpCheck1xx() {
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
+        RequestHeadersUriSpec requestHeadersUriSpec = mock(RequestHeadersUriSpec.class);
+        ResponseSpec responseSpec = mock(ResponseSpec.class);
+
+        when(restClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(TARGET)).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.toBodilessEntity()).thenReturn(new ResponseEntity<>(HttpStatus.CONTINUE));
+
+        assertThat(httpCheckAdapter.httpCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, WARNING, "HTTP call warning: status=100"));
+    }
+
+    @Test
+    void httpCheck3xx() {
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
+        RequestHeadersUriSpec requestHeadersUriSpec = mock(RequestHeadersUriSpec.class);
+        ResponseSpec responseSpec = mock(ResponseSpec.class);
+
+        when(restClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(TARGET)).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.toBodilessEntity()).thenReturn(new ResponseEntity<>(HttpStatus.MULTIPLE_CHOICES));
+
+        assertThat(httpCheckAdapter.httpCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, WARNING, "HTTP call warning: status=300"));
+    }
+
+    @Test
+    void httpCheck4xx() {
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
+        RequestHeadersUriSpec requestHeadersUriSpec = mock(RequestHeadersUriSpec.class);
+        ResponseSpec responseSpec = mock(ResponseSpec.class);
+
+        when(restClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(TARGET)).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.toBodilessEntity()).thenReturn(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+
+        assertThat(httpCheckAdapter.httpCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, "HTTP call failed: status=400"));
+    }
+
+    @Test
+    void httpCheck5xx() {
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
+        RequestHeadersUriSpec requestHeadersUriSpec = mock(RequestHeadersUriSpec.class);
+        ResponseSpec responseSpec = mock(ResponseSpec.class);
+
+        when(restClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(TARGET)).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.toBodilessEntity()).thenReturn(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        assertThat(httpCheckAdapter.httpCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, "HTTP call failed: status=500"));
+    }
+
+    @Test
     void httpCheckFailure() {
         Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
         RequestHeadersUriSpec requestHeadersUriSpec = mock(RequestHeadersUriSpec.class);
