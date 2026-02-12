@@ -10,6 +10,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
@@ -168,6 +169,29 @@ class HttpCheckAdapterTest {
         when(responseSpec.toBodilessEntity()).thenReturn(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
 
         assertThat(httpCheckAdapter.httpCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, "HTTP call failed: status=500"));
+    }
+
+    @Test
+    void httpCheckUnknown() {
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
+        RequestHeadersUriSpec requestHeadersUriSpec = mock(RequestHeadersUriSpec.class);
+        ResponseSpec responseSpec = mock(ResponseSpec.class);
+
+        when(restClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(TARGET)).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
+        ResponseEntity responseEntity = mock(ResponseEntity.class);
+        when(responseSpec.toBodilessEntity()).thenReturn(responseEntity);
+        HttpStatusCode httpStatusCode = mock(HttpStatus.class);
+        when(responseEntity.getStatusCode()).thenReturn(httpStatusCode);
+        when(httpStatusCode.value()).thenReturn(900);
+        when(httpStatusCode.is1xxInformational()).thenReturn(false);
+        when(httpStatusCode.is2xxSuccessful()).thenReturn(false);
+        when(httpStatusCode.is3xxRedirection()).thenReturn(false);
+        when(httpStatusCode.is4xxClientError()).thenReturn(false);
+        when(httpStatusCode.is5xxServerError()).thenReturn(false);
+
+        assertThat(httpCheckAdapter.httpCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, UNKNOWN, "HTTP call unknown: status=900"));
     }
 
     @Test
