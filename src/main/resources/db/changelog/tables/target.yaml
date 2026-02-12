@@ -32,3 +32,19 @@ databaseChangeLog:
       rollback:
         - dropTable:
             tableName: TARGET
+  - changeSet:
+      id: 6-add-acceptable_status_code
+      author: adetremerie
+      changes:
+        - addColumn:
+            tableName: TARGET
+            columns:
+              - column:
+                  name: acceptable_status_code
+                  type: integer
+                  constraints:
+                    nullable: true
+      rollback:
+        - dropColumn:
+            tableName: TARGET
+            columnName: acceptable_status_code

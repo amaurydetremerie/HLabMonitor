@@ -28,8 +28,7 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 
-import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult.FAILURE;
-import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult.SUCCESS;
+import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult.*;
 import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType.HTTP;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -74,7 +73,7 @@ class HttpCheckAdapterTest {
         doThrow(new IOException(EXCEPTION_MESSAGE)).when(addressMock).isReachable(5000);
         try (MockedStatic<InetAddress> inetAddressMockedStatic = Mockito.mockStatic(InetAddress.class)) {
             inetAddressMockedStatic.when(() -> InetAddress.getByName("target")).thenReturn(addressMock);
-            assertThat(httpCheckAdapter.ping(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, EXCEPTION_MESSAGE));
+            assertThat(httpCheckAdapter.ping(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, ERROR, EXCEPTION_MESSAGE));
         }
     }
 
@@ -83,7 +82,7 @@ class HttpCheckAdapterTest {
         Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
         try (MockedStatic<InetAddress> inetAddressMockedStatic = Mockito.mockStatic(InetAddress.class)) {
             inetAddressMockedStatic.when(() -> InetAddress.getByName("target")).thenThrow(new UnknownHostException());
-            assertThat(httpCheckAdapter.ping(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, "Unknown host"));
+            assertThat(httpCheckAdapter.ping(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, WARNING, "Unknown host"));
         }
     }
 
@@ -98,7 +97,21 @@ class HttpCheckAdapterTest {
         when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.toBodilessEntity()).thenReturn(new ResponseEntity<>(HttpStatus.OK));
 
-        assertThat(httpCheckAdapter.httpCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, SUCCESS, ""));
+        assertThat(httpCheckAdapter.httpCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, SUCCESS, "HTTP call success: status=200"));
+    }
+
+    @Test
+    void httpCheckSuccessCustomCode() {
+        Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1), 302);
+        RequestHeadersUriSpec requestHeadersUriSpec = mock(RequestHeadersUriSpec.class);
+        ResponseSpec responseSpec = mock(ResponseSpec.class);
+
+        when(restClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(TARGET)).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.toBodilessEntity()).thenReturn(new ResponseEntity<>(HttpStatus.FOUND));
+
+        assertThat(httpCheckAdapter.httpCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, SUCCESS, "HTTP call success: status=302"));
     }
 
     @Test
@@ -112,7 +125,7 @@ class HttpCheckAdapterTest {
         when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.toBodilessEntity()).thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
-        assertThat(httpCheckAdapter.httpCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, ""));
+        assertThat(httpCheckAdapter.httpCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, "HTTP call failed: status=404"));
     }
 
     @Test
@@ -126,7 +139,7 @@ class HttpCheckAdapterTest {
         when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.toBodilessEntity()).thenThrow(new ResourceAccessException("exception"));
 
-        assertThat(httpCheckAdapter.httpCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, "exception"));
+        assertThat(httpCheckAdapter.httpCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, ERROR, "exception"));
     }
 
     @Test
@@ -135,7 +148,7 @@ class HttpCheckAdapterTest {
 
         try (MockedStatic<URI> uriMockedStatic = Mockito.mockStatic(URI.class)) {
             uriMockedStatic.when(() -> URI.create(TARGET)).thenThrow(new IllegalArgumentException());
-            assertThat(httpCheckAdapter.certCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, "Malformed URL"));
+            assertThat(httpCheckAdapter.certCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, WARNING, "Malformed URL"));
         }
     }
 
@@ -147,7 +160,7 @@ class HttpCheckAdapterTest {
         try (MockedStatic<URI> uriMockedStatic = Mockito.mockStatic(URI.class)) {
             uriMockedStatic.when(() -> URI.create(TARGET)).thenReturn(uri);
             when(uri.toURL()).thenThrow(new MalformedURLException());
-            assertThat(httpCheckAdapter.certCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, "Malformed URL"));
+            assertThat(httpCheckAdapter.certCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, WARNING, "Malformed URL"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -163,7 +176,7 @@ class HttpCheckAdapterTest {
             uriMockedStatic.when(() -> URI.create(TARGET)).thenReturn(uri);
             when(uri.toURL()).thenReturn(url);
             when(url.openConnection()).thenThrow(new IOException("IOException"));
-            assertThat(httpCheckAdapter.certCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, "IOException"));
+            assertThat(httpCheckAdapter.certCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, ERROR, "IOException"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -181,7 +194,7 @@ class HttpCheckAdapterTest {
             when(uri.toURL()).thenReturn(url);
             when(url.openConnection()).thenReturn(hsc);
             doThrow(new SocketTimeoutException()).when(hsc).connect();
-            assertThat(httpCheckAdapter.certCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, "Timeout"));
+            assertThat(httpCheckAdapter.certCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, WARNING, "Timeout"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -200,7 +213,7 @@ class HttpCheckAdapterTest {
             when(url.openConnection()).thenReturn(hsc);
             doNothing().when(hsc).connect();
             when(hsc.getServerCertificates()).thenThrow(new SSLPeerUnverifiedException(""));
-            assertThat(httpCheckAdapter.certCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, "Peer unverified"));
+            assertThat(httpCheckAdapter.certCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, WARNING, "Peer unverified"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -292,7 +305,7 @@ class HttpCheckAdapterTest {
             when(url.openConnection()).thenReturn(hsc);
             doNothing().when(hsc).connect();
             when(hsc.getServerCertificates()).thenReturn(certs);
-            assertThat(httpCheckAdapter.certCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, "No certificate found"));
+            assertThat(httpCheckAdapter.certCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, ERROR, "No certificate found"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -314,7 +327,7 @@ class HttpCheckAdapterTest {
             when(url.openConnection()).thenReturn(hsc);
             doNothing().when(hsc).connect();
             when(hsc.getServerCertificates()).thenReturn(certs);
-            assertThat(httpCheckAdapter.certCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, FAILURE, "No certificate found"));
+            assertThat(httpCheckAdapter.certCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, ERROR, "No certificate found"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
