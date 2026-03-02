@@ -3,21 +3,9 @@ package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.in.notification;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Notification;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.Monitoring;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.notification.NotificationType;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.logging.LogLevel;
-import org.springframework.messaging.Message;
-
-import javax.net.ssl.HttpsURLConnection;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 
 @AllArgsConstructor
 @Slf4j

@@ -70,8 +70,9 @@ public class CheckNotificationController {
         emitter.onTimeout(() -> emitters.remove(emitter));
         emitter.onError(e -> emitters.remove(emitter));
 
-        ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor();
-        sseMvcExecutor.execute(() -> sendCountToEmitter(emitter));
+        try(ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor()) {
+            sseMvcExecutor.execute(() -> sendCountToEmitter(emitter));
+        }
 
         return emitter;
     }

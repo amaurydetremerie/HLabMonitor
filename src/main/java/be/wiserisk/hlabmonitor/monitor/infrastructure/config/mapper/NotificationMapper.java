@@ -1,13 +1,10 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper;
 
 import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult;
-import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType;
 import be.wiserisk.hlabmonitor.monitor.domain.enums.NotificationStatus;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Notification;
-import be.wiserisk.hlabmonitor.monitor.domain.model.Target;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.NotificationEntity;
-import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.TargetEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
