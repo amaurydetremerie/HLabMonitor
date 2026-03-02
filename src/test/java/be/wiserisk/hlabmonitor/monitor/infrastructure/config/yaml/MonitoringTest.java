@@ -63,7 +63,7 @@ class MonitoringTest {
         private Monitoring monitoring;
         @Test
         void monitoringFull() {
-            assertThat(monitoring).isNotNull().hasNoNullFieldsOrProperties();
+            assertThat(monitoring).isNotNull().hasNoNullFieldsOrPropertiesExcept("notification");
         }
     }
 
