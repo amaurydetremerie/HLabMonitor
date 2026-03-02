@@ -10,8 +10,4 @@ public record CheckResultsFilter(Instant from,
                                  Instant to,
                                  List<TargetId> targetIdList,
                                  List<MonitoringResult> monitoringResultList,
-                                 List<MonitoringType> monitoringTypeList) {
-    public CheckResultsFilter(List<TargetId> targetIdList) {
-        this(null, null, targetIdList, null, null);
-    }
-}
+                                 List<MonitoringType> monitoringTypeList) {}
