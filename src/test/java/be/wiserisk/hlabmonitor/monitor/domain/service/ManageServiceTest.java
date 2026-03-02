@@ -1,6 +1,7 @@
 package be.wiserisk.hlabmonitor.monitor.domain.service;
 
 import be.wiserisk.hlabmonitor.monitor.application.port.in.execution.ExecuteCheckUseCase;
+import be.wiserisk.hlabmonitor.monitor.application.port.in.execution.ExecuteNotificationUseCase;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.CheckTriggerCallback;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.MonitoringSchedulerPort;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.PersistencePort;
@@ -39,6 +40,9 @@ class ManageServiceTest {
 
     @Mock
     private ExecuteCheckUseCase executeCheckUseCase;
+
+    @Mock
+    private ExecuteNotificationUseCase executeNotificationUseCase;
 
     @Spy
     @InjectMocks

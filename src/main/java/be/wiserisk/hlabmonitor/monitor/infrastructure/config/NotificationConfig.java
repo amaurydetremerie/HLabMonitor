@@ -4,6 +4,8 @@ import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.in.notification.*;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.in.rest.CheckNotificationController;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.Monitoring;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.notification.SmtpConfig;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,6 +24,10 @@ public class NotificationConfig {
 
     @Bean
     public JavaMailSender javaMailSender(Monitoring monitoring) {
+        if(monitoring.getNotification() == null ||
+                monitoring.getNotification().notificationEmail() == null){
+            return null;
+        }
         SmtpConfig smtpConfig = monitoring.getNotification().notificationEmail().smtp();
 
         if(smtpConfig == null ||
@@ -46,7 +52,8 @@ public class NotificationConfig {
     }
 
     @Bean
-    public EmailSender emailSender(Monitoring monitoring, JavaMailSender javaMailSender) {
+    public EmailSender emailSender(Monitoring monitoring, ObjectProvider<JavaMailSender> provider) {
+        JavaMailSender javaMailSender = provider.getIfAvailable();
         if((javaMailSender == null || monitoring.getNotification() == null) ||
                 !monitoring.getNotification().enabled() ||
                 (monitoring.getNotification().notificationEmail() == null) ||

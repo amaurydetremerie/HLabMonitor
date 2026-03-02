@@ -8,7 +8,7 @@ monitoring:
   notification:
     email:
       from: killamaury@gmail.com
-      smtp:
+      smtp: {}
     discord:
       webhookUrl: url
     telegram:
