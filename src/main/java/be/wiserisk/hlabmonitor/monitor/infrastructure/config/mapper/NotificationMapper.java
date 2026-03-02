@@ -43,7 +43,7 @@ public interface NotificationMapper {
         return result == null ? null : result.name();
     }
     default MonitoringResult mapMonitoringResult(String result) {
-        if (result == null) return UNKNOWN;
+        if (result == null) return null;
         try {
             return MonitoringResult.valueOf(result);
         } catch (IllegalArgumentException ex) {

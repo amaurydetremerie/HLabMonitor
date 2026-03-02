@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class NotificationMapperTest {
 
-    private NotificationMapper notificationMapper = new NotificationMapperImpl();
+    private final NotificationMapper notificationMapper = new NotificationMapperImpl();
 
     private static final Long NOTIFICATION_ID = 1L;
     private static final String TARGET_ID_STRING = "targetId";
@@ -37,15 +37,15 @@ class NotificationMapperTest {
 
     @Test
     void toDomain_resultAndStatusNull() {
-        Notification notification = new Notification(NOTIFICATION_ID, TARGET_ID, FAILED, NOW, NOW, UNKNOWN, UNKNOWN);
+        Notification notification = new Notification(NOTIFICATION_ID, TARGET_ID, FAILED, NOW, NOW, null, null);
         NotificationEntity notificationEntity = new NotificationEntity();
         notificationEntity.setId(NOTIFICATION_ID);
         notificationEntity.setTargetId(TARGET_ID_STRING);
-        notificationEntity.setNotificationStatus(FAILED.name());
+        notificationEntity.setNotificationStatus(null);
         notificationEntity.setFireAt(NOW);
         notificationEntity.setResolvedAt(NOW);
-        notificationEntity.setOldResult(UNKNOWN.name());
-        notificationEntity.setNewResult(UNKNOWN.name());
+        notificationEntity.setOldResult(null);
+        notificationEntity.setNewResult(null);
         assertThat(notificationMapper.toDomain(notificationEntity)).isNotNull().isEqualTo(notification);
     }
 
@@ -79,15 +79,15 @@ class NotificationMapperTest {
 
     @Test
     void toEntity_resultAndStatusNull() {
-        Notification notification = new Notification(NOTIFICATION_ID, TARGET_ID, FAILED, NOW, NOW, UNKNOWN, UNKNOWN);
+        Notification notification = new Notification(NOTIFICATION_ID, TARGET_ID, null, NOW, NOW, null, null);
         NotificationEntity notificationEntity = new NotificationEntity();
         notificationEntity.setId(NOTIFICATION_ID);
         notificationEntity.setTargetId(TARGET_ID_STRING);
         notificationEntity.setNotificationStatus(FAILED.name());
         notificationEntity.setFireAt(NOW);
         notificationEntity.setResolvedAt(NOW);
-        notificationEntity.setOldResult(UNKNOWN.name());
-        notificationEntity.setNewResult(UNKNOWN.name());
+        notificationEntity.setOldResult(null);
+        notificationEntity.setNewResult(null);
         assertThat(notificationMapper.toEntity(notification)).isNotNull().isEqualTo(notificationEntity);
     }
 }

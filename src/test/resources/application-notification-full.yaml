@@ -1,0 +1,14 @@
+monitoring:
+  notification:
+    email:
+      from: mail
+      smtp:
+        host: smtp
+        password: pass
+    discord:
+      webhookUrl: link
+    telegram:
+      token: token
+      chatId: id
+    log:
+      level: INFO

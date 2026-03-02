@@ -1,0 +1,11 @@
+monitoring:
+  notification:
+    enabled: false
+    email:
+      enabled: false
+    discord:
+      enabled: false
+    telegram:
+      enabled: false
+    log:
+      enabled: false

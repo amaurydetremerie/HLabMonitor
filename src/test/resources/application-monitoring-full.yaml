@@ -5,14 +5,3 @@ monitoring:
   http:
     http-1:
       target: www.example.com
-  notification:
-    email:
-      from: killamaury@gmail.com
-      smtp: {}
-    discord:
-      webhookUrl: url
-    telegram:
-      token: token
-      chatId: chatId
-    log:
-      level: INFO
