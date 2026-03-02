@@ -1,6 +1,7 @@
 package be.wiserisk.hlabmonitor.monitor.domain.service;
 
 import be.wiserisk.hlabmonitor.monitor.application.port.in.execution.ExecuteCheckUseCase;
+import be.wiserisk.hlabmonitor.monitor.application.port.in.execution.ExecuteNotificationUseCase;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.CheckTargetPort;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.PersistencePort;
 import be.wiserisk.hlabmonitor.monitor.domain.exception.UnsupportedEnumException;
@@ -14,10 +15,14 @@ public class MonitoringService implements ExecuteCheckUseCase {
 
     private final CheckTargetPort checkPort;
     private final PersistencePort persistencePort;
+    private final ExecuteNotificationUseCase executeNotificationUseCase;
 
     @Override
     public void executeCheck(TargetId targetId) {
-        persistencePort.saveResult(getTargetResult(retrieveTarget(targetId)));
+        executeNotificationUseCase.handleNotification(
+                persistencePort.saveResult(
+                        getTargetResult(
+                                retrieveTarget(targetId))));
     }
 
     private TargetResult getTargetResult(Target target) {

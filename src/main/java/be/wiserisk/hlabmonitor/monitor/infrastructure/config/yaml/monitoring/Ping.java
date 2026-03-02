@@ -1,10 +1,10 @@
-package be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml;
+package be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.monitoring;
 
 import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
 import java.time.Duration;
 
-import static be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.Common.calculateInterval;
+import static be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.monitoring.Common.calculateInterval;
 
 public record Ping(String target, Duration interval) implements Common {
     public static final Duration DEFAULT_INTERVAL = Duration.ofMinutes(5L);

@@ -4,7 +4,7 @@ import be.wiserisk.hlabmonitor.monitor.application.port.out.CheckTargetPort;
 import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Target;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetResult;
-import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.Common;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.monitoring.Common;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.ResourceAccessException;

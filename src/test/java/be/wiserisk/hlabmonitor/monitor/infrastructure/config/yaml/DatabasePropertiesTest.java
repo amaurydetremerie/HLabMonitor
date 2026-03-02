@@ -1,5 +1,7 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml;
 
+import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.database.DatabaseProperties;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.database.SystemInterface;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -11,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
-import static be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.DatabaseProperties.DatabaseType.*;
+import static be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.database.DatabaseProperties.DatabaseType.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DatabasePropertiesTest {

@@ -1,5 +1,6 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml;
 
+import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.monitoring.Common;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

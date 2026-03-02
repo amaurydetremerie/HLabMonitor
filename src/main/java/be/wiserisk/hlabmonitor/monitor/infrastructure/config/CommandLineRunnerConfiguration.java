@@ -2,7 +2,7 @@ package be.wiserisk.hlabmonitor.monitor.infrastructure.config;
 
 import be.wiserisk.hlabmonitor.monitor.application.port.in.management.ManageMonitoringConfigUseCase;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.Monitoring;
-import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.MonitoringToTargetAdapter;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.monitoring.MonitoringToTargetAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;

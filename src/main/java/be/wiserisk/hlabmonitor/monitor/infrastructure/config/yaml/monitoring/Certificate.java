@@ -1,8 +1,8 @@
-package be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml;
+package be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.monitoring;
 
 import java.time.Duration;
 
-import static be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.Common.calculateInterval;
+import static be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.monitoring.Common.calculateInterval;
 
 public record Certificate(Duration interval) implements Common {
 

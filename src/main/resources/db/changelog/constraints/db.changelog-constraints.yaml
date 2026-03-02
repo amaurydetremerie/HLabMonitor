@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db/changelog/constraints/target.yaml
   - include:
       file: db/changelog/constraints/result.yaml
+  - include:
+      file: db/changelog/constraints/notification.yaml

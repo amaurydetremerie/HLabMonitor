@@ -1,6 +1,6 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.config;
 
-import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.DatabaseProperties;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.database.DatabaseProperties;
 import com.zaxxer.hikari.HikariDataSource;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.context.annotation.Bean;

@@ -1,0 +1,161 @@
+databaseChangeLog:
+  - changeSet:
+      id: 8-add-notification-target-foreign-key
+      author: adetremerie
+      dbms: "!sqlite"
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: NOTIFICATION
+            baseColumnNames: target_id
+            constraintName: fk_notification_target
+            referencedTableName: TARGET
+            referencedColumnNames: target_id
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+      rollback:
+        - dropForeignKeyConstraint:
+            baseTableName: NOTIFICATION
+            constraintName: fk_notification_target
+  - changeSet:
+      id: 8-add-notification-target-foreign-key-sqlite-rebuild
+      author: adetremerie
+      dbms: sqlite
+      preConditions:
+        - onFail: HALT
+        - onError: HALT
+        - sqlCheck:
+            expectedResult: "0"
+            sql: |
+              SELECT COUNT(*)
+              FROM NOTIFICATION n
+              LEFT JOIN TARGET t ON t.target_id = n.target_id
+              WHERE t.target_id IS NULL;
+      changes:
+        - renameTable:
+            oldTableName: NOTIFICATION
+            newTableName: NOTIFICATION_old
+        - createTable:
+            tableName: NOTIFICATION
+            columns:
+                - column:
+                    name: id
+                    type: integer
+                    autoIncrement: true
+                    constraints:
+                      primaryKey: true
+                      primaryKeyName: pk_result
+                      nullable: false
+                - column:
+                    name: target_id
+                    type: varchar(255)
+                    constraints:
+                      nullable: false
+                      referencedTableName: TARGET
+                      referencedColumnNames: target_id
+                      foreignKeyName: fk_notification_target
+                      deleteCascade: true
+                - column:
+                    name: notification_status
+                    type: varchar(255)
+                    constraints:
+                      nullable: false
+                - column:
+                    name: old_result
+                    type: varchar(255)
+                    constraints:
+                      nullable: false
+                - column:
+                    name: new_result
+                    type: varchar(255)
+                    constraints:
+                      nullable: true
+                - column:
+                    name: fire_at
+                    type: BIGINT
+                    constraints:
+                      nullable: false
+                - column:
+                    name: resolved_at
+                    type: BIGINT
+                    constraints:
+                      nullable: true
+        - sql:
+            sql: |
+                INSERT INTO NOTIFICATION (id, target_id, notification_status, old_result, new_result, fire_at, resolved_at)
+                SELECT id, target_id, notification_status, old_result, new_result, fire_at, resolved_at
+                FROM NOTIFICATION_old;
+        - dropTable:
+            tableName: NOTIFICATION_old
+      rollback:
+        - renameTable:
+            oldTableName: NOTIFICATION
+            newTableName: NOTIFICATION_fk
+
+        - createTable:
+            tableName: NOTIFICATION
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_result
+                    nullable: false
+              - column:
+                  name: target_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: notification_status
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: old_result
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: new_result
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: fire_at
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: resolved_at
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+        - sql:
+            sql: |
+              INSERT INTO NOTIFICATION (id, target_id, notification_status, old_result, new_result, fire_at, resolved_at)
+                SELECT id, target_id, notification_status, old_result, new_result, fire_at, resolved_at
+              FROM NOTIFICATION_fk;
+        - dropTable:
+            tableName: NOTIFICATION_fk
+  - changeSet:
+      id: 9-index-notification-fire-at
+      author: adetremerie
+      changes:
+        - createIndex:
+            tableName: NOTIFICATION
+            indexName: idx_result_fire_at
+            columns:
+              - column:
+                  name: fire_at
+  - changeSet:
+      id: 10-index-notification-resolved-at
+      author: adetremerie
+      changes:
+        - createIndex:
+            tableName: NOTIFICATION
+            indexName: idx_result_resolved_at
+            columns:
+              - column:
+                  name: resolved_at

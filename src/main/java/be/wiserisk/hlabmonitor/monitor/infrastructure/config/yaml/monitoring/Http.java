@@ -1,11 +1,11 @@
-package be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml;
+package be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.monitoring;
 
 import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
 import java.time.Duration;
 import java.util.Map;
 
-import static be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.Common.calculateInterval;
+import static be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.monitoring.Common.calculateInterval;
 
 public record Http(String target, Duration interval, boolean ssl, Certificate certificate, Integer statusCode) implements Common {
     public static final Duration DEFAULT_INTERVAL = Duration.ofMinutes(10L);

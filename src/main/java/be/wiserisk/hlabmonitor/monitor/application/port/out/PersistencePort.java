@@ -5,9 +5,10 @@ import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType;
 import be.wiserisk.hlabmonitor.monitor.domain.model.*;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PersistencePort {
-    void saveResult(TargetResult targetResult);
+    TargetResult saveResult(TargetResult targetResult);
 
     Target getTarget(TargetId targetId);
 
@@ -36,4 +37,16 @@ public interface PersistencePort {
     Long countLast24hResults();
 
     Long countLast24hResults(MonitoringResult monitoringResult);
+
+    Optional<Notification> getSendNotification(TargetId targetId);
+
+    TargetResult getLastTargetResult(TargetId targetId);
+
+    boolean isResultChanged(TargetId targetId);
+
+    Notification saveNotification(Notification notification);
+
+    List<Notification> getActiveNotifications();
+
+    Integer countActiveNotifications();
 }

@@ -15,4 +15,8 @@ public interface ResultEntityRepository extends JpaRepository<ResultEntity, Long
     Long countByCheckedAtGreaterThanEqual(Instant checkedAt);
 
     Long countByResultAndCheckedAtGreaterThanEqual(String result, Instant checkedAt);
+
+    ResultEntity findLastByTargetId(String targetId);
+
+    ResultEntity findTopByTargetId(String id);
 }

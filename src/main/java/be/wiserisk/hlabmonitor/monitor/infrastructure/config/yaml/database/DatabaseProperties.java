@@ -1,10 +1,10 @@
-package be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml;
+package be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.database;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
-import static be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.SystemInterface.getEnv;
-import static be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.SystemInterface.getProperty;
+import static be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.database.SystemInterface.getEnv;
+import static be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.database.SystemInterface.getProperty;
 
 @ConfigurationProperties(prefix = "database")
 public record DatabaseProperties(

@@ -11,4 +11,7 @@ public record CheckResultsFilter(Instant from,
                                  List<TargetId> targetIdList,
                                  List<MonitoringResult> monitoringResultList,
                                  List<MonitoringType> monitoringTypeList) {
+    public CheckResultsFilter(List<TargetId> targetIdList) {
+        this(null, null, targetIdList, null, null);
+    }
 }
