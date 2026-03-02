@@ -1,5 +1,6 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml;
 
+import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.notification.NotificationEmail;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.notification.NotificationType;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -9,9 +10,34 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MonitoringTest {
+    @Nested
+    class NotificationTestRequired {
+        @Test
+        void notificationRequired() {
+            assertThatThrownBy(() -> new NotificationEmail(null, null, null, null, null, null, null))
+                    .isInstanceOf(NullPointerException.class)
+                    .hasMessage("from is null");
+        }
+    }
+
+    @Nested
+    @SpringBootTest(classes = MonitoringTest.TestConfig.class)
+    @ActiveProfiles({"test", "notification-smtp"})
+    class NotificationTestSmtp {
+        @Autowired
+        private Monitoring monitoring;
+        @Test
+        void notificationSmtp() {
+            assertThat(monitoring.getNotification().notificationEmail().smtp()).extracting("auth", "tls").isEqualTo(List.of(false, false));
+        }
+    }
+
     @Nested
     @SpringBootTest(classes = MonitoringTest.TestConfig.class)
     @ActiveProfiles({"test", "notification-full"})
@@ -20,6 +46,18 @@ class MonitoringTest {
         private Monitoring monitoring;
         @Test
         void notificationFull() {
+            assertThat(monitoring.getNotification()).hasNoNullFieldsOrProperties();
+        }
+    }
+
+    @Nested
+    @SpringBootTest(classes = MonitoringTest.TestConfig.class)
+    @ActiveProfiles({"test", "notification-default"})
+    class NotificationTestDefault {
+        @Autowired
+        private Monitoring monitoring;
+        @Test
+        void notificationDefault() {
             assertThat(monitoring.getNotification()).hasNoNullFieldsOrProperties();
         }
     }

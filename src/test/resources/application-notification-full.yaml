@@ -1,14 +1,36 @@
 monitoring:
   notification:
+    enabled: true
     email:
+      enabled: true
+      firing: true
+      resolved: true
+      failed: true
       from: mail
+      to: mail
       smtp:
         host: smtp
+        port: 1
+        username: user
         password: pass
+        auth: true
+        tls: true
     discord:
+      enabled: true
+      firing: true
+      resolved: true
+      failed: true
       webhookUrl: link
     telegram:
+      enabled: true
+      firing: true
+      resolved: true
+      failed: true
       token: token
       chatId: id
     log:
+      enabled: true
+      firing: true
+      resolved: true
+      failed: true
       level: INFO

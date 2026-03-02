@@ -47,7 +47,15 @@ class HLabMonitorApplicationTest {
         }
     }
 
-
+    @Nested
+    @SpringBootTest
+    @ActiveProfiles({"test", "monitoring-minimal"})
+    class HLabMonitorApplicationTestMonitoring {
+        @Test
+        void contextLoads() {
+            // Method to verify if the context can load
+        }
+    }
 
 
 }

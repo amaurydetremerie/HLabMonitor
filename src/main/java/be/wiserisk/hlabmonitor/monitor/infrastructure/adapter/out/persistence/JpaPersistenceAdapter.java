@@ -163,11 +163,11 @@ public class JpaPersistenceAdapter implements PersistencePort {
 
     @Override
     public boolean isResultChanged(TargetId targetId) {
-        NotificationEntity notificationEntity = notificationEntityRepository.findTopByTargetId(targetId.id());
         ResultEntity resultEntity = resultEntityRepository.findTopByTargetId(targetId.id());
         if(resultEntity == null) {
             throw new ResultNotFoundException(targetId);
         }
+        NotificationEntity notificationEntity = notificationEntityRepository.findTopByTargetId(targetId.id());
         MonitoringResult monitoringResult = MonitoringResult.valueOf(resultEntity.getResult());
         if(notificationEntity == null) {
             return !monitoringResult.getFamily().equals(MonitoringResult.Family.SUCCESS);
@@ -176,7 +176,7 @@ public class JpaPersistenceAdapter implements PersistencePort {
             return !monitoringResult.getFamily().equals(MonitoringResult.Family.SUCCESS);
         }
         MonitoringResult notificationResult = MonitoringResult.valueOf(notificationEntity.getOldResult());
-        return monitoringResult.getFamily().equals(notificationResult.getFamily());
+        return !monitoringResult.getFamily().equals(notificationResult.getFamily());
     }
 
     @Override

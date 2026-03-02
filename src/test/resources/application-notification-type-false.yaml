@@ -1,6 +1,7 @@
 monitoring:
   notification:
     email:
+      from: mail
       firing: false
       resolved: false
       failed: false

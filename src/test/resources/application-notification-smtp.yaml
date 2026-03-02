@@ -1,0 +1,7 @@
+monitoring:
+  notification:
+    email:
+      from: mail
+      smtp:
+        auth: false
+        tls: false

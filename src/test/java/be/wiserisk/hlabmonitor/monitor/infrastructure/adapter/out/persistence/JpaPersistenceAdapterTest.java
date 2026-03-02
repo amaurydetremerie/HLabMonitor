@@ -1,12 +1,12 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence;
 
+import be.wiserisk.hlabmonitor.monitor.domain.exception.ResultNotFoundException;
 import be.wiserisk.hlabmonitor.monitor.domain.model.*;
-import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.ResultEntity;
-import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.ResultEntity_;
-import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.TargetEntity;
-import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.TargetEntity_;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.*;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.NotificationEntityRepository;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.ResultEntityRepository;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.TargetEntityRepository;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper.NotificationMapper;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper.ResultMapper;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper.TargetMapper;
 import jakarta.persistence.criteria.*;
@@ -24,11 +24,16 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult.FAILURE;
 import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult.SUCCESS;
 import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType.HTTP;
 import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType.PING;
+import static be.wiserisk.hlabmonitor.monitor.domain.enums.NotificationStatus.SEND;
+import static be.wiserisk.hlabmonitor.monitor.domain.enums.NotificationStatus.TO_SEND;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
@@ -41,6 +46,8 @@ class JpaPersistenceAdapterTest {
     public static final List<TargetResult> TARGET_RESULTS = List.of(TARGET_RESULT);
     public static final ResultEntity RESULT_ENTITY = new ResultEntity();
     public static final Target TARGET = new Target(TARGET_ID, PING, "target", Duration.ofMinutes(1));
+    public static final NotificationEntity NOTIFICATION_ENTITY = new NotificationEntity();
+    public static final Notification NOTIFICATION = new Notification(TARGET_RESULT);
 
     @InjectMocks
     private JpaPersistenceAdapter jpaPersistenceAdapter;
@@ -50,9 +57,106 @@ class JpaPersistenceAdapterTest {
     @Mock
     private TargetEntityRepository targetEntityRepository;
     @Mock
+    private NotificationEntityRepository notificationEntityRepository;
+    @Mock
     private TargetMapper targetMapper;
     @Mock
     private ResultMapper resultMapper;
+    @Mock
+    private NotificationMapper notificationMapper;
+
+    @Test
+    void countActiveNotifications() {
+        when(notificationEntityRepository.countByNotificationStatus(SEND.name())).thenReturn(1);
+        assertThat(jpaPersistenceAdapter.countActiveNotifications()).isEqualTo(1);
+    }
+
+    @Test
+    void getActiveNotifications() {
+        when(notificationEntityRepository.findAllByNotificationStatus(SEND.name())).thenReturn(List.of(NOTIFICATION_ENTITY));
+        when(notificationMapper.toDomain(NOTIFICATION_ENTITY)).thenReturn(NOTIFICATION);
+        assertThat(jpaPersistenceAdapter.getActiveNotifications()).isNotNull().containsExactly(NOTIFICATION);
+    }
+
+    @Test
+    void saveNotification() {
+        when(notificationEntityRepository.save(NOTIFICATION_ENTITY)).thenReturn(NOTIFICATION_ENTITY);
+        when(notificationMapper.toEntity(NOTIFICATION)).thenReturn(NOTIFICATION_ENTITY);
+        when(notificationMapper.toDomain(NOTIFICATION_ENTITY)).thenReturn(NOTIFICATION);
+        assertThat(jpaPersistenceAdapter.saveNotification(NOTIFICATION)).isNotNull().isEqualTo(NOTIFICATION);
+    }
+
+    @Test
+    void isResultChanged_notificationEntitySend_ResultSuccess() {
+        NotificationEntity notificationEntity = mock(NotificationEntity.class);
+        when(notificationEntity.getNotificationStatus()).thenReturn(SEND.name());
+        when(notificationEntity.getOldResult()).thenReturn(FAILURE.name());
+        ResultEntity resultEntity = mock(ResultEntity.class);
+        when(resultEntity.getResult()).thenReturn(SUCCESS.name());
+        when(resultEntityRepository.findTopByTargetId(TARGET_ID_STRING)).thenReturn(resultEntity);
+        when(notificationEntityRepository.findTopByTargetId(TARGET_ID_STRING)).thenReturn(notificationEntity);
+        assertThat(jpaPersistenceAdapter.isResultChanged(TARGET_ID)).isTrue();
+    }
+
+    @Test
+    void isResultChanged_notificationEntityNotSend_ResultFailure() {
+        NotificationEntity notificationEntity = mock(NotificationEntity.class);
+        when(notificationEntity.getNotificationStatus()).thenReturn(TO_SEND.name());
+        ResultEntity resultEntity = mock(ResultEntity.class);
+        when(resultEntity.getResult()).thenReturn(FAILURE.name());
+        when(resultEntityRepository.findTopByTargetId(TARGET_ID_STRING)).thenReturn(resultEntity);
+        when(notificationEntityRepository.findTopByTargetId(TARGET_ID_STRING)).thenReturn(notificationEntity);
+        assertThat(jpaPersistenceAdapter.isResultChanged(TARGET_ID)).isTrue();
+    }
+
+    @Test
+    void isResultChanged_notificationEntityNotSend_ResultSuccess() {
+        NotificationEntity notificationEntity = mock(NotificationEntity.class);
+        when(notificationEntity.getNotificationStatus()).thenReturn(TO_SEND.name());
+        ResultEntity resultEntity = mock(ResultEntity.class);
+        when(resultEntity.getResult()).thenReturn(SUCCESS.name());
+        when(resultEntityRepository.findTopByTargetId(TARGET_ID_STRING)).thenReturn(resultEntity);
+        when(notificationEntityRepository.findTopByTargetId(TARGET_ID_STRING)).thenReturn(notificationEntity);
+        assertThat(jpaPersistenceAdapter.isResultChanged(TARGET_ID)).isFalse();
+    }
+
+    @Test
+    void isResultChanged_notificationEntityNull_ResultFailure() {
+        ResultEntity resultEntity = mock(ResultEntity.class);
+        when(resultEntity.getResult()).thenReturn(FAILURE.name());
+        when(resultEntityRepository.findTopByTargetId(TARGET_ID_STRING)).thenReturn(resultEntity);
+        when(notificationEntityRepository.findTopByTargetId(TARGET_ID_STRING)).thenReturn(null);
+        assertThat(jpaPersistenceAdapter.isResultChanged(TARGET_ID)).isTrue();
+    }
+
+    @Test
+    void isResultChanged_notificationEntityNull_ResultSuccess() {
+        ResultEntity resultEntity = mock(ResultEntity.class);
+        when(resultEntity.getResult()).thenReturn(SUCCESS.name());
+        when(resultEntityRepository.findTopByTargetId(TARGET_ID_STRING)).thenReturn(resultEntity);
+        when(notificationEntityRepository.findTopByTargetId(TARGET_ID_STRING)).thenReturn(null);
+        assertThat(jpaPersistenceAdapter.isResultChanged(TARGET_ID)).isFalse();
+    }
+
+    @Test
+    void isResultChanged_resultNull() {
+        when(resultEntityRepository.findTopByTargetId(TARGET_ID_STRING)).thenReturn(null);
+        assertThatThrownBy(() -> jpaPersistenceAdapter.isResultChanged(TARGET_ID)).isInstanceOf(ResultNotFoundException.class);
+    }
+
+    @Test
+    void getLastTargetResult() {
+        when(resultEntityRepository.findLastByTargetId(TARGET_ID_STRING)).thenReturn(RESULT_ENTITY);
+        when(resultMapper.toDomain(RESULT_ENTITY)).thenReturn(TARGET_RESULT);
+        assertThat(jpaPersistenceAdapter.getLastTargetResult(TARGET_ID)).isNotNull().isEqualTo(TARGET_RESULT);
+    }
+
+    @Test
+    void getSendNotification() {
+        when(notificationEntityRepository.findLastByTargetIdAndNotificationStatus(TARGET_ID_STRING, SEND.name())).thenReturn(NOTIFICATION_ENTITY);
+        when(notificationMapper.toDomain(NOTIFICATION_ENTITY)).thenReturn(NOTIFICATION);
+        assertThat(jpaPersistenceAdapter.getSendNotification(TARGET_ID)).isNotNull().isEqualTo(Optional.of(NOTIFICATION));
+    }
 
     @Test
     void getAllTargetIds() {

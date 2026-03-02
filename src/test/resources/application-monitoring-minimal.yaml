@@ -1,0 +1,17 @@
+monitoring:
+  notification:
+    email:
+      from: mail
+    discord:
+      link: link
+    telegram:
+        token: token
+        chatId: id
+    log:
+        level: INFO
+  ping:
+    local:
+      target: 0.0.0.0
+  http:
+    local:
+      target: http://0.0.0.0
