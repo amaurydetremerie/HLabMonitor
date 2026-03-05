@@ -16,10 +16,13 @@ import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult.FAILURE;
 import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult.SUCCESS;
+import static be.wiserisk.hlabmonitor.monitor.domain.enums.NotificationStatus.FAILED;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
@@ -89,4 +92,45 @@ class NotificationServiceTest {
         assertDoesNotThrow(() -> notificationService.handleNotification(targetResult));
     }
 
+    @Test
+    void saveNotification() {
+        Notification notification = mock(Notification.class);
+        when(notification.notificationStatus()).thenReturn(FAILED);
+        when(persistencePort.saveNotification(any(Notification.class))).thenReturn(notification);
+        doNothing().when(notificationPort).sendNotification(notification);
+        assertDoesNotThrow(() -> notificationService.saveNotification(notification));
+    }
+
+    @Test
+    void resendNotification_empty() {
+        when(persistencePort.getSendNotification(TARGET_ID)).thenReturn(Optional.empty());
+
+        assertDoesNotThrow(() -> notificationService.resendNotification(TARGET_ID));
+    }
+
+    @Test
+    void resendNotification_present() {
+        Notification notification = mock(Notification.class);
+
+        when(persistencePort.getSendNotification(TARGET_ID)).thenReturn(Optional.of(notification));
+        doNothing().when(notificationPort).sendNotification(notification);
+
+        assertDoesNotThrow(() -> notificationService.resendNotification(TARGET_ID));
+    }
+
+    @Test
+    void getActiveNotifications() {
+        Notification notification = mock(Notification.class);
+
+        when(persistencePort.getActiveNotifications()).thenReturn(List.of(notification));
+
+        assertThat(notificationService.getActiveNotifications()).isNotNull().containsExactly(notification);
+    }
+
+    @Test
+    void countActiveNotifications() {
+        when(persistencePort.countActiveNotifications()).thenReturn(2);
+
+        assertThat(notificationService.countActiveNotifications()).isEqualTo(2);
+    }
 }
