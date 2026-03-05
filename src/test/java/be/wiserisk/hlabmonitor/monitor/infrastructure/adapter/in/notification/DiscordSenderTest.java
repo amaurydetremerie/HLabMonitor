@@ -2,6 +2,7 @@ package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.in.notification;
 
 
 import be.wiserisk.hlabmonitor.monitor.domain.enums.NotificationStatus;
+import be.wiserisk.hlabmonitor.monitor.domain.exception.NotificationSenderException;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Notification;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.Monitoring;
@@ -18,11 +19,13 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
@@ -42,6 +45,32 @@ class DiscordSenderTest {
                 null, null, new NotificationDiscord(
                 true, null, notificationType), null, null));
         assertThat(discordSender.getNotificationType(monitoring)).isNotNull().isEqualTo(notificationType);
+    }
+
+    @Test
+    void sendNotification_URISyntaxException() {
+        DiscordSender sender = new DiscordSender(null, "http:");
+        assertThatThrownBy(() -> sender.sendNotification(null)).isInstanceOf(NotificationSenderException.class);
+    }
+
+    @Test
+    void sendNotification_SecurityException() {
+        try(MockedConstruction<URI> uriMockedConstruction = Mockito.mockConstruction(URI.class, (mock, context) -> {
+            when(mock.toURL()).thenThrow(new SecurityException());
+        })) {
+            assertThatThrownBy(() -> discordSender.sendNotification(null)).isInstanceOf(NotificationSenderException.class);
+        }
+    }
+
+    @Test
+    void sendNotification_IOException() {
+        try(MockedConstruction<URI> uriMockedConstruction = Mockito.mockConstruction(URI.class, (mock, context) -> {
+            URL url = mock(URL.class);
+            when(mock.toURL()).thenReturn(url);
+            when(url.openConnection()).thenThrow(new IOException());
+        })) {
+            assertThatThrownBy(() -> discordSender.sendNotification(null)).isInstanceOf(NotificationSenderException.class);
+        }
     }
 
     @Test

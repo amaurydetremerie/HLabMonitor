@@ -1,5 +1,6 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.in.notification;
 
+import be.wiserisk.hlabmonitor.monitor.domain.exception.NotificationSenderException;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Notification;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.Monitoring;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.notification.NotificationType;
@@ -31,9 +32,8 @@ public class TelegramSender implements NotificationSender{
                     objectMapper.writeValueAsBytes(getMessage(notification))
             );
             connection.getInputStream().close();
-
         } catch (Exception e) {
-            // log ici
+            throw new NotificationSenderException(e);
         }
     }
 
