@@ -2,18 +2,13 @@ package be.wiserisk.hlabmonitor.monitor.domain.service;
 
 import be.wiserisk.hlabmonitor.monitor.application.port.out.NotificationPort;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.PersistencePort;
-import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult;
-import be.wiserisk.hlabmonitor.monitor.domain.enums.NotificationStatus;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Notification;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedConstruction;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;

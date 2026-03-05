@@ -21,11 +21,11 @@ import org.springframework.boot.logging.LogLevel;
 import java.util.stream.Stream;
 
 import static be.wiserisk.hlabmonitor.monitor.domain.enums.NotificationStatus.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 import static org.springframework.boot.logging.LogLevel.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class LogSenderTest {
 

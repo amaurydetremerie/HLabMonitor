@@ -12,11 +12,6 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 
-import java.net.InetAddress;
-import java.util.List;
-
-import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult.SUCCESS;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
