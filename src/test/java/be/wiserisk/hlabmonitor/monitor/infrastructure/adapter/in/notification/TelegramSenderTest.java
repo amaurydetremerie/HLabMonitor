@@ -41,9 +41,8 @@ class TelegramSenderTest {
     }
 
     @Test
-    void sendNotification_Error() throws JsonProcessingException {
+    void sendNotification_Error() {
         try(MockedConstruction<URI> uriMockedConstruction = mockConstruction(URI.class, (mock, ctx) -> {
-            URL url = mock(URL.class);
             when(mock.toURL()).thenThrow(new MalformedURLException());
         })) {
             TelegramSender telegramSender = new TelegramSender(null, "", "");

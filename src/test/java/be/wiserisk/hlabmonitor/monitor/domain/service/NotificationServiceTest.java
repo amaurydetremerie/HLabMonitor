@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class NotificationServiceTest {
 
-    private final static TargetId TARGET_ID = new TargetId("targetId");
+    private static final TargetId TARGET_ID = new TargetId("targetId");
 
     @InjectMocks
     private NotificationService notificationService;
