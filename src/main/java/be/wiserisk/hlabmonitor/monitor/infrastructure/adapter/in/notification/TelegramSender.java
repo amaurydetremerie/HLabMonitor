@@ -42,7 +42,7 @@ public class TelegramSender implements NotificationSender{
         return monitoring.getNotification().notificationTelegram().notificationType();
     }
 
-    private Map<String, Object> getMessage(Notification notification) {
+    private Map<String, String> getMessage(Notification notification) {
         return Map.of(
                 "chat_id", chatId,
                 "parse_mode", "HTML",

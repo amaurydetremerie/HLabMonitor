@@ -32,8 +32,8 @@ public class NotificationConfig {
         if(smtpConfig == null ||
                 smtpConfig.host() == null || smtpConfig.host().isEmpty() ||
                 smtpConfig.port() <= 0 ||
-                smtpConfig.username() == null || smtpConfig.username().isEmpty() ||
-                smtpConfig.password() == null || smtpConfig.password().isEmpty()){
+                smtpConfig.username() == null ||
+                smtpConfig.password() == null){
             return null;
         }
 

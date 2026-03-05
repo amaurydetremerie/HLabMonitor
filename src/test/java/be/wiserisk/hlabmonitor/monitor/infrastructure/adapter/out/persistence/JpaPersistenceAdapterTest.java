@@ -87,6 +87,18 @@ class JpaPersistenceAdapterTest {
     }
 
     @Test
+    void isResultChanged_notificationEntitySend_ResultFailure() {
+        NotificationEntity notificationEntity = mock(NotificationEntity.class);
+        when(notificationEntity.getNotificationStatus()).thenReturn(SEND.name());
+        when(notificationEntity.getOldResult()).thenReturn(FAILURE.name());
+        ResultEntity resultEntity = mock(ResultEntity.class);
+        when(resultEntity.getResult()).thenReturn(FAILURE.name());
+        when(resultEntityRepository.findTopByTargetId(TARGET_ID_STRING)).thenReturn(resultEntity);
+        when(notificationEntityRepository.findTopByTargetId(TARGET_ID_STRING)).thenReturn(notificationEntity);
+        assertThat(jpaPersistenceAdapter.isResultChanged(TARGET_ID)).isFalse();
+    }
+
+    @Test
     void isResultChanged_notificationEntitySend_ResultSuccess() {
         NotificationEntity notificationEntity = mock(NotificationEntity.class);
         when(notificationEntity.getNotificationStatus()).thenReturn(SEND.name());

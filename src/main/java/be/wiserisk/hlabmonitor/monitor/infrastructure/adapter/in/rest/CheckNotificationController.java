@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -66,9 +65,9 @@ public class CheckNotificationController {
         SseEmitter emitter = new SseEmitter(0L);
         emitters.add(emitter);
 
-        emitter.onCompletion(() -> emitters.remove(emitter));
-        emitter.onTimeout(() -> emitters.remove(emitter));
-        emitter.onError(e -> emitters.remove(emitter));
+        emitter.onCompletion(() -> removeEmitter(emitter));
+        emitter.onTimeout(() -> removeEmitter(emitter));
+        emitter.onError(e -> removeEmitter(emitter));
 
         try(ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor()) {
             sseMvcExecutor.execute(() -> sendCountToEmitter(emitter));
@@ -77,19 +76,14 @@ public class CheckNotificationController {
         return emitter;
     }
 
+    private void removeEmitter(SseEmitter emitter) {
+        emitters.remove(emitter);
+    }
+
     public void broadcastDbCount() {
-        List<SseEmitter> dead = new ArrayList<>();
-
         for (SseEmitter emitter : emitters) {
-            try {
-                sendCountToEmitter(emitter);
-            } catch (Exception e) {
-                dead.add(emitter);
-            }
+            sendCountToEmitter(emitter);
         }
-
-        emitters.removeAll(dead);
-        dead.forEach(SseEmitter::complete);
     }
 
     private void sendCountToEmitter(SseEmitter emitter) {
@@ -98,6 +92,7 @@ public class CheckNotificationController {
                     .name("notifications-count-update")
                     .data(getCurrentCount()));
         } catch (Exception e) {
+            removeEmitter(emitter);
             emitter.completeWithError(e);
         }
     }

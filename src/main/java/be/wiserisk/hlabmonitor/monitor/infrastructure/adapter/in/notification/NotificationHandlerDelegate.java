@@ -23,7 +23,7 @@ public class NotificationHandlerDelegate {
                              List<NotificationSender> senders,
                              Monitoring monitoring) {
         for (NotificationSender sender : senders) {
-            if (shouldSendNotification(notification.notificationStatus(), sender, sender.getNotificationType(monitoring))) {
+            if (shouldSendNotification(notification.notificationStatus(), sender.getNotificationType(monitoring))) {
                 sender.sendNotification(notification);
             }
         }
@@ -31,13 +31,12 @@ public class NotificationHandlerDelegate {
 
     private boolean shouldSendNotification(
             NotificationStatus status,
-            NotificationSender sender,
             NotificationType notificationType) {
 
         return switch (status) {
-            case SEND -> sender.isFiring(notificationType);
-            case TERMINATED -> sender.isResolved(notificationType);
-            case FAILED -> sender.isFailed(notificationType);
+            case SEND -> notificationType.firing();
+            case TERMINATED -> notificationType.resolved();
+            case FAILED -> notificationType.failed();
             default -> false;
         };
     }

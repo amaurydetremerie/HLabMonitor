@@ -4,13 +4,14 @@ import be.wiserisk.hlabmonitor.monitor.domain.model.Notification;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.Monitoring;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.notification.NotificationType;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.logging.LogLevel;
 
 @AllArgsConstructor
-@Slf4j
 public class LogSender implements NotificationSender {
 
+    private final Logger log = LoggerFactory.getLogger(LogSender.class);
     private final LogLevel level;
 
     @Override
@@ -36,6 +37,6 @@ public class LogSender implements NotificationSender {
 
     @Override
     public NotificationType getNotificationType(Monitoring monitoring) {
-        return monitoring.getNotification().notificationDiscord().notificationType();
+        return monitoring.getNotification().notificationLog().notificationType();
     }
 }

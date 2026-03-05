@@ -2,8 +2,10 @@ monitoring:
   notification:
     email:
       from: mail
+      smtp:
+        host: host
     discord:
-      link: link
+      webhookUrl: link
     telegram:
         token: token
         chatId: id
