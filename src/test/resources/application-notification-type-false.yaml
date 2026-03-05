@@ -1,0 +1,19 @@
+monitoring:
+  notification:
+    email:
+      from: mail
+      firing: false
+      resolved: false
+      failed: false
+    discord:
+      firing: false
+      resolved: false
+      failed: false
+    telegram:
+      firing: false
+      resolved: false
+      failed: false
+    log:
+      firing: false
+      resolved: false
+      failed: false

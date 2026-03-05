@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db/changelog/tables/target.yaml
   - include:
       file: db/changelog/tables/result.yaml
+  - include:
+      file: db/changelog/tables/notification.yaml

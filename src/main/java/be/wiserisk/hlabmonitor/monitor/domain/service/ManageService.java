@@ -1,6 +1,7 @@
 package be.wiserisk.hlabmonitor.monitor.domain.service;
 
 import be.wiserisk.hlabmonitor.monitor.application.port.in.execution.ExecuteCheckUseCase;
+import be.wiserisk.hlabmonitor.monitor.application.port.in.execution.ExecuteNotificationUseCase;
 import be.wiserisk.hlabmonitor.monitor.application.port.in.management.ManageMonitoringConfigUseCase;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.MonitoringSchedulerPort;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.PersistencePort;
@@ -20,6 +21,7 @@ public class ManageService implements ManageMonitoringConfigUseCase {
     private final PersistencePort persistencePort;
     private final MonitoringSchedulerPort schedulerPort;
     private final ExecuteCheckUseCase executeCheckUseCase;
+    private final ExecuteNotificationUseCase executeNotificationUseCase;
 
     private final Map<String, ScheduleHandle> activeSchedules = new ConcurrentHashMap<>();
 
@@ -101,6 +103,7 @@ public class ManageService implements ManageMonitoringConfigUseCase {
     void scheduleTargetMonitoring(Target target) {
         ScheduleHandle handle = schedulerPort.scheduleTarget(target, executeCheckUseCase::executeCheck);
         activeSchedules.put(target.id().id(), handle);
+        executeNotificationUseCase.resendNotification(target.id());
     }
 
     private void unscheduleTarget(TargetId targetId) {

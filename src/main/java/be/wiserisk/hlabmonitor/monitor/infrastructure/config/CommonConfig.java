@@ -1,5 +1,6 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
@@ -14,6 +15,11 @@ import org.springframework.web.client.RestClient;
 
 @Configuration
 public class CommonConfig {
+
+    @Bean
+    ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
 
     @Bean
     OpenApiCustomizer defaultProblemResponses() {

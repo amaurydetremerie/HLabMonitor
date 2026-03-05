@@ -3,13 +3,13 @@ package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence;
 import be.wiserisk.hlabmonitor.monitor.application.port.out.PersistencePort;
 import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult;
 import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType;
+import be.wiserisk.hlabmonitor.monitor.domain.exception.ResultNotFoundException;
 import be.wiserisk.hlabmonitor.monitor.domain.model.*;
-import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.ResultEntity;
-import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.ResultEntity_;
-import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.TargetEntity;
-import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.TargetEntity_;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.*;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.NotificationEntityRepository;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.ResultEntityRepository;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.TargetEntityRepository;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper.NotificationMapper;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper.ResultMapper;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper.TargetMapper;
 import jakarta.persistence.criteria.Predicate;
@@ -24,18 +24,23 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import static be.wiserisk.hlabmonitor.monitor.domain.enums.NotificationStatus.SEND;
 
 @AllArgsConstructor
 public class JpaPersistenceAdapter implements PersistencePort {
 
+    NotificationEntityRepository notificationEntityRepository;
     ResultEntityRepository resultEntityRepository;
     TargetEntityRepository targetEntityRepository;
+    NotificationMapper notificationMapper;
     TargetMapper targetMapper;
     ResultMapper resultMapper;
 
     @Override
-    public void saveResult(TargetResult targetResult) {
-        resultEntityRepository.save(resultMapper.toEntity(targetResult));
+    public TargetResult saveResult(TargetResult targetResult) {
+        return resultMapper.toDomain(resultEntityRepository.save(resultMapper.toEntity(targetResult)));
     }
 
     @Override
@@ -146,6 +151,53 @@ public class JpaPersistenceAdapter implements PersistencePort {
         return resultEntityRepository.countByResultAndCheckedAtGreaterThanEqual(monitoringResult.name(), Instant.now().minus(Duration.ofHours(24)));
     }
 
+    @Override
+    public Optional<Notification> getSendNotification(TargetId targetId) {
+        return Optional.ofNullable(notificationMapper.toDomain(notificationEntityRepository.findLastByTargetIdAndNotificationStatus(targetId.id(), SEND.name())));
+    }
+
+    @Override
+    public TargetResult getLastTargetResult(TargetId targetId) {
+        return resultMapper.toDomain(resultEntityRepository.findLastByTargetId(targetId.id()));
+    }
+
+    @Override
+    public boolean isResultChanged(TargetId targetId) {
+        ResultEntity resultEntity = resultEntityRepository.findTopByTargetId(targetId.id());
+        if(resultEntity == null) {
+            throw new ResultNotFoundException(targetId);
+        }
+        NotificationEntity notificationEntity = notificationEntityRepository.findTopByTargetId(targetId.id());
+        MonitoringResult monitoringResult = MonitoringResult.valueOf(resultEntity.getResult());
+        if(notificationEntity == null) {
+            return !monitoringResult.getFamily().equals(MonitoringResult.Family.SUCCESS);
+        }
+        if(!notificationEntity.getNotificationStatus().equals(SEND.name())) {
+            return !monitoringResult.getFamily().equals(MonitoringResult.Family.SUCCESS);
+        }
+        MonitoringResult notificationResult = MonitoringResult.valueOf(notificationEntity.getOldResult());
+        return !monitoringResult.getFamily().equals(notificationResult.getFamily());
+    }
+
+    @Override
+    public Notification saveNotification(Notification notification) {
+        return notificationMapper.toDomain(notificationEntityRepository.save(notificationMapper.toEntity(notification)));
+    }
+
+    @Override
+    public List<Notification> getActiveNotifications() {
+        return toNotificationList(notificationEntityRepository.findAllByNotificationStatus(SEND.name()));
+    }
+
+    @Override
+    public Integer countActiveNotifications() {
+        return notificationEntityRepository.countByNotificationStatus(SEND.name());
+    }
+
+    private List<Notification> toNotificationList(List<NotificationEntity> notificationEntityList) {
+        return notificationEntityList.stream().map(notificationMapper::toDomain).toList();
+    }
+
     private List<TargetId> toTargetIdList(List<TargetEntity> targetEntityList) {
         return targetEntityList.stream().map(t -> new TargetId(t.getTargetId())).toList();
     }
@@ -153,14 +205,14 @@ public class JpaPersistenceAdapter implements PersistencePort {
     private List<TargetResult> toTargetResultList(List<ResultEntity> resultEntityList) {
         return resultEntityList
                 .stream()
-                .map(result -> resultMapper.toDomain(result))
+                .map(resultMapper::toDomain)
                 .toList();
     }
 
     private List<Target> toTargetList(List<TargetEntity> targetEntityList) {
         return targetEntityList
                 .stream()
-                .map(targetEntity -> targetMapper.toDomain(targetEntity))
+                .map(targetMapper::toDomain)
                 .toList();
     }
 }

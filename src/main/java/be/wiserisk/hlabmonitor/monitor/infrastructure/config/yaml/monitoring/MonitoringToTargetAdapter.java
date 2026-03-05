@@ -1,8 +1,9 @@
-package be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml;
+package be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.monitoring;
 
 import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Target;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.Monitoring;
 
 import java.util.List;
 import java.util.Map;

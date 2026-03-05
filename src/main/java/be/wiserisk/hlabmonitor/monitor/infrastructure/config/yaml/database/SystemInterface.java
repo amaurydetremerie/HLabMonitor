@@ -1,4 +1,4 @@
-package be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml;
+package be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.database;
 
 public interface SystemInterface {
 
