@@ -2,6 +2,7 @@ package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.in.notification;
 
 
 import be.wiserisk.hlabmonitor.monitor.domain.enums.NotificationStatus;
+import be.wiserisk.hlabmonitor.monitor.domain.exception.NotificationSenderException;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Notification;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.Monitoring;
@@ -17,11 +18,13 @@ import org.mockito.MockedConstruction;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
@@ -35,6 +38,17 @@ class TelegramSenderTest {
                 null, null, null, new NotificationTelegram(
                 true, null, null, notificationType), null));
         assertThat(telegramSender.getNotificationType(monitoring)).isNotNull().isEqualTo(notificationType);
+    }
+
+    @Test
+    void sendNotification_Error() throws JsonProcessingException {
+        try(MockedConstruction<URI> uriMockedConstruction = mockConstruction(URI.class, (mock, ctx) -> {
+            URL url = mock(URL.class);
+            when(mock.toURL()).thenThrow(new MalformedURLException());
+        })) {
+            TelegramSender telegramSender = new TelegramSender(null, "", "");
+            assertThatThrownBy(() -> telegramSender.sendNotification(null)).isInstanceOf(NotificationSenderException.class);
+        }
     }
 
     @Test

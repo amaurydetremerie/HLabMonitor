@@ -2,12 +2,14 @@ package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.in.notification;
 
 
 import be.wiserisk.hlabmonitor.monitor.domain.enums.NotificationStatus;
+import be.wiserisk.hlabmonitor.monitor.domain.exception.NotificationSenderException;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Notification;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.Monitoring;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.notification.NotificationEmail;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.notification.NotificationProperties;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.notification.NotificationType;
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +19,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
@@ -36,6 +39,18 @@ class EmailSenderTest {
                 null, new NotificationEmail(
                 true, "null", null, notificationType, null), null, null, null));
         assertThat(emailSender.getNotificationType(monitoring)).isNotNull().isEqualTo(notificationType);
+    }
+
+    @Test
+    void sendNotification_Error() {
+        try(MockedConstruction<MimeMessageHelper> mimeMessageHelperMockedConstruction = Mockito.mockConstruction(MimeMessageHelper.class, (mock, context) -> {
+            doThrow(MessagingException.class).when(mock).setFrom((String) null);
+        })) {
+            MimeMessage mimeMessage = mock(MimeMessage.class);
+            when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+
+            assertThatThrownBy(() -> emailSender.sendNotification(null)).isInstanceOf(NotificationSenderException.class);
+        }
     }
 
     @Test
