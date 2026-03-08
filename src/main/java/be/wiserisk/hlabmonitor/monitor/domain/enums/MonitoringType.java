@@ -4,6 +4,7 @@ public enum MonitoringType {
     PING,
     CERTIFICATE,
     HTTP,
+    HTTP_INTERNAL,
     SPEEDTEST,
     UNKNOWN
 }

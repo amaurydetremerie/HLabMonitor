@@ -41,7 +41,7 @@ public class MonitoringToTargetAdapter {
         return https.entrySet().stream()
                 .map(entry -> new Target(
                         new TargetId(entry.getKey() + ":http"),
-                        MonitoringType.HTTP,
+                        entry.getValue().internal() ? MonitoringType.HTTP_INTERNAL : MonitoringType.HTTP,
                         entry.getValue().target(),
                         entry.getValue().interval(),
                         entry.getValue().statusCode()

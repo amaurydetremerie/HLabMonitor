@@ -44,6 +44,8 @@ class HttpCheckAdapterTest {
 
     @Mock
     private RestClient restClient;
+    @Mock
+    private RestClient internalRestClient;
 
     @Test
     void pingSuccess() throws IOException {
