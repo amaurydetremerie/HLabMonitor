@@ -28,7 +28,7 @@ public class MonitoringService implements ExecuteCheckUseCase {
     private TargetResult getTargetResult(Target target) {
         return switch (target.type()) {
             case PING -> pingTarget(target);
-            case HTTP -> getTarget(target);
+            case HTTP, HTTP_INTERNAL -> getTarget(target);
             case CERTIFICATE -> verifyCert(target);
             case SPEEDTEST -> throw new UnsupportedOperationException("Not supported yet.");
             default -> throw new UnsupportedEnumException(target.type());

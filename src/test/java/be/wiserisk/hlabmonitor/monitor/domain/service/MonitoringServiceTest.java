@@ -36,6 +36,19 @@ class MonitoringServiceTest {
     private ExecuteNotificationUseCase executeNotificationUseCase;
 
     @Test
+    void executeCheckHttpInternal() {
+        TargetResult targetResult = new TargetResult(TARGET_ID, SUCCESS, "");
+        Target target = new Target(TARGET_ID, HTTP_INTERNAL, TARGET, Duration.ofMinutes(1));
+
+        when(persistencePort.getTarget(TARGET_ID)).thenReturn(target);
+        when(checkPort.httpCheck(target)).thenReturn(targetResult);
+        when(persistencePort.saveResult(targetResult)).thenReturn(targetResult);
+
+        assertDoesNotThrow(() -> monitoringService.executeCheck(TARGET_ID));
+        verify(executeNotificationUseCase, times(1)).handleNotification(targetResult);
+    }
+
+    @Test
     void executeCheckHttp() {
         TargetResult targetResult = new TargetResult(TARGET_ID, SUCCESS, "");
         Target target = new Target(TARGET_ID, HTTP, TARGET, Duration.ofMinutes(1));
