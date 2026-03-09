@@ -50,6 +50,19 @@ class MonitoringToTargetAdapterTest {
         }
 
         @Test
+        void shouldExtractInternalHttpTargets() {
+            Map<String, Http> https = new HashMap<>();
+            https.put("http1", new Http("https://example.com", Duration.ofSeconds(60), false, null, null, true));
+            Monitoring monitoring = new Monitoring(null, https, null);
+
+            List<Target> result = adapter.extractTargets(monitoring);
+
+            assertThat(result).hasSize(1);
+            assertThat(result.getFirst().type()).isEqualTo(MonitoringType.HTTP_INTERNAL);
+            assertThat(result.getFirst().id().id()).isEqualTo("http1:http");
+        }
+
+        @Test
         void shouldExtractOnlyHttpTargets() {
             Map<String, Http> https = new HashMap<>();
             https.put("http1", new Http("https://example.com", Duration.ofSeconds(60), false, null, null, false));
