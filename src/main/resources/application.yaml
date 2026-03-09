@@ -9,10 +9,15 @@ logging:
     root: ERROR
     be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.in.notification.LogSender: TRACE
 management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,metrics
   endpoint:
     health:
       probes:
         enabled: true
+      show-details: always
   health:
     livenessState:
       enabled: true

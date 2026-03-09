@@ -5,6 +5,7 @@ import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.in.rest.CheckNotif
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.Monitoring;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.notification.SmtpConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -111,5 +112,10 @@ public class NotificationConfig {
             return null;
         }
         return new LogSender(monitoring.getNotification().notificationLog().level());
+    }
+
+    @Bean
+    public PrometheusSender prometheusSender(MeterRegistry meterRegistry) {
+        return new PrometheusSender(meterRegistry);
     }
 }
