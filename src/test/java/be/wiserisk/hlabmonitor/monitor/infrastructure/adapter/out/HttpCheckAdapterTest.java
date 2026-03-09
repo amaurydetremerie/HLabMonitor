@@ -2,9 +2,9 @@ package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out;
 
 import be.wiserisk.hlabmonitor.monitor.domain.model.Target;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -31,6 +31,7 @@ import java.util.List;
 
 import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult.*;
 import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType.HTTP;
+import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType.HTTP_INTERNAL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -39,11 +40,18 @@ class HttpCheckAdapterTest {
     public static final String TARGET = "target";
     public static final TargetId TARGET_ID = new TargetId("TargetId");
     public static final String EXCEPTION_MESSAGE = "Exception Message";
-    @InjectMocks
+
     private HttpCheckAdapter httpCheckAdapter;
 
     @Mock
     private RestClient restClient;
+    @Mock
+    private RestClient internalRestClient;
+
+    @BeforeEach
+    void setup() {
+        httpCheckAdapter = new HttpCheckAdapter(restClient, internalRestClient);
+    }
 
     @Test
     void pingSuccess() throws IOException {
@@ -85,6 +93,20 @@ class HttpCheckAdapterTest {
             inetAddressMockedStatic.when(() -> InetAddress.getByName("target")).thenThrow(new UnknownHostException());
             assertThat(httpCheckAdapter.ping(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, WARNING, "Unknown host"));
         }
+    }
+
+    @Test
+    void httpCheckInternal() {
+        Target target = new Target(TARGET_ID, HTTP_INTERNAL, TARGET, Duration.ofMinutes(1));
+        RequestHeadersUriSpec requestHeadersUriSpec = mock(RequestHeadersUriSpec.class);
+        ResponseSpec responseSpec = mock(ResponseSpec.class);
+
+        when(internalRestClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(TARGET)).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.toBodilessEntity()).thenReturn(new ResponseEntity<>(HttpStatus.OK));
+
+        assertThat(httpCheckAdapter.httpCheck(target)).isNotNull().extracting("id", "result", "message").isEqualTo(List.of(TARGET_ID, SUCCESS, "HTTP call success: status=200"));
     }
 
     @Test

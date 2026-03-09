@@ -31,9 +31,10 @@ public class AdapterConfig {
 
     @Bean
     public CheckTargetPort checkTargetPort(
-            RestClient restClient) {
+            RestClient restClient,
+            RestClient internalRestClient) {
         return new HttpCheckAdapter(
-                restClient);
+                restClient, internalRestClient);
     }
 
     @Bean

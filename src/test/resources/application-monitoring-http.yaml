@@ -1,6 +1,7 @@
 monitoring:
   http:
     https-with-cert-full:
+      internal: false
       target: www.example.com
       interval: 1s
       ssl: true
@@ -43,4 +44,7 @@ monitoring:
       target: www.example.com
       ssl: false
     https-with-protocol:
+      target: https://test.com
+    https-internal:
+      internal: true
       target: https://test.com

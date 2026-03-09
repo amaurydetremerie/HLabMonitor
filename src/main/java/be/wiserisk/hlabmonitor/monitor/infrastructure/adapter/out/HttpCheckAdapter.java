@@ -2,6 +2,7 @@ package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out;
 
 import be.wiserisk.hlabmonitor.monitor.application.port.out.CheckTargetPort;
 import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult;
+import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Target;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetResult;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.monitoring.Common;
@@ -25,6 +26,7 @@ import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult.*;
 public class HttpCheckAdapter implements CheckTargetPort {
 
     private final RestClient restClient;
+    private final RestClient internalRestClient;
 
     @Override
     public TargetResult ping(Target target) {
@@ -60,7 +62,14 @@ public class HttpCheckAdapter implements CheckTargetPort {
     }
 
     private HttpStatusCode getStatusCode(Target target) {
-        return restClient.get().uri(target.target()).retrieve().toBodilessEntity().getStatusCode();
+        RestClient usedRestClient = getTargetRestClient(target.type());
+        return usedRestClient.get().uri(target.target()).retrieve().toBodilessEntity().getStatusCode();
+    }
+
+    private RestClient getTargetRestClient(MonitoringType type) {
+        if (type == MonitoringType.HTTP_INTERNAL)
+            return internalRestClient;
+        return restClient;
     }
 
     @Override

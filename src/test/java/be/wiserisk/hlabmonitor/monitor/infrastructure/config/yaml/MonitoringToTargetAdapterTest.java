@@ -50,9 +50,22 @@ class MonitoringToTargetAdapterTest {
         }
 
         @Test
+        void shouldExtractInternalHttpTargets() {
+            Map<String, Http> https = new HashMap<>();
+            https.put("http1", new Http("https://example.com", Duration.ofSeconds(60), false, null, null, true));
+            Monitoring monitoring = new Monitoring(null, https, null);
+
+            List<Target> result = adapter.extractTargets(monitoring);
+
+            assertThat(result).hasSize(1);
+            assertThat(result.getFirst().type()).isEqualTo(MonitoringType.HTTP_INTERNAL);
+            assertThat(result.getFirst().id().id()).isEqualTo("http1:http");
+        }
+
+        @Test
         void shouldExtractOnlyHttpTargets() {
             Map<String, Http> https = new HashMap<>();
-            https.put("http1", new Http("https://example.com", Duration.ofSeconds(60), false, null, null));
+            https.put("http1", new Http("https://example.com", Duration.ofSeconds(60), false, null, null, false));
             Monitoring monitoring = new Monitoring(null, https, null);
 
             List<Target> result = adapter.extractTargets(monitoring);
@@ -66,7 +79,7 @@ class MonitoringToTargetAdapterTest {
         void shouldExtractHttpAndCertificateTargetsWhenSslEnabled() {
             Certificate cert = new Certificate(Duration.ofDays(1));
             Map<String, Http> https = new HashMap<>();
-            https.put("https1", new Http("https://secure.com", Duration.ofSeconds(60), true, cert, null));
+            https.put("https1", new Http("https://secure.com", Duration.ofSeconds(60), true, cert, null, false));
             Monitoring monitoring = new Monitoring(null, https, null);
 
             List<Target> result = adapter.extractTargets(monitoring);
@@ -83,9 +96,9 @@ class MonitoringToTargetAdapterTest {
 
             Certificate cert = new Certificate(Duration.ofDays(7));
             Map<String, Http> https = new HashMap<>();
-            https.put("http1", new Http("https://example.com", Duration.ofSeconds(60), false, null, null));
-            https.put("https1", new Http("https://secure.com", Duration.ofSeconds(60), true, cert, null));
-            https.put("https2", new Http("https://secure.com", Duration.ofSeconds(60), true, null, null));
+            https.put("http1", new Http("https://example.com", Duration.ofSeconds(60), false, null, null, false));
+            https.put("https1", new Http("https://secure.com", Duration.ofSeconds(60), true, cert, null, false));
+            https.put("https2", new Http("https://secure.com", Duration.ofSeconds(60), true, null, null, false));
 
             Monitoring monitoring = new Monitoring(pings, https, null);
 
@@ -113,7 +126,7 @@ class MonitoringToTargetAdapterTest {
 
             Certificate cert = new Certificate(certInterval);
             Map<String, Http> https = new HashMap<>();
-            https.put("https1", new Http("https://secure.com", httpInterval, true, cert, null));
+            https.put("https1", new Http("https://secure.com", httpInterval, true, cert, null, false));
 
             Monitoring monitoring = new Monitoring(pings, https, null);
 
@@ -188,8 +201,8 @@ class MonitoringToTargetAdapterTest {
         @Test
         void shouldCreateHttpTargetsForAllEntries() {
             Map<String, Http> https = new HashMap<>();
-            https.put("api1", new Http("https://api.example.com", Duration.ofSeconds(30), false, null, 302));
-            https.put("api2", new Http("https://api2.example.com", Duration.ofMinutes(1), true, new Certificate(Duration.ofDays(1)), null));
+            https.put("api1", new Http("https://api.example.com", Duration.ofSeconds(30), false, null, 302, false));
+            https.put("api2", new Http("https://api2.example.com", Duration.ofMinutes(1), true, new Certificate(Duration.ofDays(1)), null, false));
 
             Monitoring monitoring = new Monitoring(null, https, null);
             List<Target> result = adapter.extractTargets(monitoring);
@@ -219,7 +232,7 @@ class MonitoringToTargetAdapterTest {
         @Test
         void shouldIgnoreHttpEntriesWithoutSsl() {
             Map<String, Http> https = new HashMap<>();
-            https.put("http1", new Http("https://example.com", Duration.ofSeconds(60), false, null, null));
+            https.put("http1", new Http("https://example.com", Duration.ofSeconds(60), false, null, null, false));
 
             List<Target> result = adapter.extractTargets(new Monitoring(null, https, null));
 
@@ -230,9 +243,9 @@ class MonitoringToTargetAdapterTest {
         void shouldCreateCertificateTargetsOnlyForSslEnabled() {
             Certificate cert = new Certificate(Duration.ofDays(7));
             Map<String, Http> https = new HashMap<>();
-            https.put("http1", new Http("https://example.com", Duration.ofSeconds(60), false, null, null));
-            https.put("https1", new Http("https://secure1.com", Duration.ofSeconds(60), true, cert, null));
-            https.put("https2", new Http("https://secure2.com", Duration.ofSeconds(60), true, cert, null));
+            https.put("http1", new Http("https://example.com", Duration.ofSeconds(60), false, null, null, false));
+            https.put("https1", new Http("https://secure1.com", Duration.ofSeconds(60), true, cert, null, false));
+            https.put("https2", new Http("https://secure2.com", Duration.ofSeconds(60), true, cert, null, false));
 
             List<Target> result = adapter.extractTargets(new Monitoring(null, https, null));
 
@@ -246,7 +259,7 @@ class MonitoringToTargetAdapterTest {
         void shouldAppendCertificateToTargetId() {
             Certificate cert = new Certificate(Duration.ofDays(30));
             Map<String, Http> https = new HashMap<>();
-            https.put("secure-api", new Http("https://secure.com", Duration.ofSeconds(60), true, cert, null));
+            https.put("secure-api", new Http("https://secure.com", Duration.ofSeconds(60), true, cert, null, false));
 
             List<Target> result = adapter.extractTargets(new Monitoring(null, https, null));
 
@@ -262,7 +275,7 @@ class MonitoringToTargetAdapterTest {
             Duration certInterval = Duration.ofDays(15);
             Certificate cert = new Certificate(certInterval);
             Map<String, Http> https = new HashMap<>();
-            https.put("https1", new Http("https://secure.com", Duration.ofSeconds(60), true, cert, null));
+            https.put("https1", new Http("https://secure.com", Duration.ofSeconds(60), true, cert, null, false));
 
             List<Target> result = adapter.extractTargets(new Monitoring(null, https, null));
 
