@@ -8,6 +8,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
+
 import static be.wiserisk.hlabmonitor.monitor.domain.enums.NotificationStatus.SEND;
 import static be.wiserisk.hlabmonitor.monitor.domain.enums.NotificationStatus.TERMINATED;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,8 +40,11 @@ class PrometheusSenderTest {
         when(notification.notificationStatus()).thenReturn(SEND);
         when(notification.targetId()).thenReturn(new TargetId("id"));
         when(notification.notificationId()).thenReturn(1L);
+        when(notification.fireAt()).thenReturn(Instant.now());
         assertDoesNotThrow(() -> prometheusSender.sendNotification(notification));
-        assertThat(simpleRegistry.getMetersAsString()).isNotNull().contains("notifications_active(GAUGE)[id='1', status='SEND', target_id='id']; value=1.0\n" +
+        assertThat(simpleRegistry.getMetersAsString()).isNotNull().contains(
+                "notifications_active(GAUGE)[id='1', status='SEND', target_id='id']; value=1.0",
+                "notifications_age_seconds(GAUGE)[id='1', target_id='id']; value=0.0",
                 "notifications_total(COUNTER)[status='SEND', target_id='id']; count=1.0");
     }
 
@@ -49,8 +54,12 @@ class PrometheusSenderTest {
         when(notification.notificationStatus()).thenReturn(TERMINATED);
         when(notification.targetId()).thenReturn(new TargetId("id"));
         when(notification.notificationId()).thenReturn(1L);
+        when(notification.fireAt()).thenReturn(Instant.now());
+        when(notification.resolvedAt()).thenReturn(Instant.now().plusSeconds(10));
         assertDoesNotThrow(() -> prometheusSender.sendNotification(notification));
-        assertThat(simpleRegistry.getMetersAsString()).isNotNull().contains("notifications_active(GAUGE)[id='1', status='TERMINATED', target_id='id']; value=0.0\n" +
+        assertThat(simpleRegistry.getMetersAsString()).isNotNull().contains(
+                "notifications_active(GAUGE)[id='1', status='TERMINATED', target_id='id']; value=0.0",
+                "notifications_resolution_seconds(GAUGE)[id='1', target_id='id']; value=10.0",
                 "notifications_total(COUNTER)[status='TERMINATED', target_id='id']; count=1.0");
     }
 
