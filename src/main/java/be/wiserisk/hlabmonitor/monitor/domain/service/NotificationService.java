@@ -56,6 +56,11 @@ public class NotificationService implements ExecuteNotificationUseCase, GetCheck
     }
 
     @Override
+    public void deleteByNotificationId(Long notificationId) {
+        persistencePort.deleteByNotificationId(notificationId);
+    }
+
+    @Override
     public List<Notification> getActiveNotifications() {
         return persistencePort.getActiveNotifications();
     }

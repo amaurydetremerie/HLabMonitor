@@ -49,4 +49,6 @@ public interface PersistencePort {
     List<Notification> getActiveNotifications();
 
     Integer countActiveNotifications();
+
+    void deleteByNotificationId(Long notificationId);
 }

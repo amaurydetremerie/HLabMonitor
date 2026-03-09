@@ -35,6 +35,12 @@ class NotificationServiceTest {
     private NotificationPort notificationPort;
 
     @Test
+    void deleteByNotificationId() {
+        assertDoesNotThrow(() -> notificationService.deleteByNotificationId(1L));
+        verify(persistencePort, times(1)).deleteByNotificationId(1L);
+    }
+
+    @Test
     void handleNotification_Empty_ResultChanged() {
         Notification notification = mock(Notification.class);
         TargetResult targetResult = mock(TargetResult.class);
