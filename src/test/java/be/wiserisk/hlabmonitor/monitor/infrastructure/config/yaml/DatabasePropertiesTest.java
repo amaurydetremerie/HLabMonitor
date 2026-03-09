@@ -49,7 +49,7 @@ class DatabasePropertiesTest {
             try (MockedStatic<SystemInterface> systemMockedStatic = Mockito.mockStatic(SystemInterface.class)) {
                 systemMockedStatic.when(() -> SystemInterface.getProperty("os.name")).thenReturn("Linux");
                 DatabaseProperties databaseProperties = new DatabaseProperties(
-                        SQLITE, null, null, null, null, null, null
+                        SQLITE, null, null, null, null, null, null, false
                 );
                 assertThat(databaseProperties).isNotNull().extracting("path").isEqualTo("/var/lib/hlabmonitor/monitor.db");
             }
@@ -61,7 +61,7 @@ class DatabasePropertiesTest {
                 systemMockedStatic.when(() -> SystemInterface.getProperty("os.name")).thenReturn("Windows");
                 systemMockedStatic.when(() -> SystemInterface.getEnv("ProgramData")).thenReturn("ProgramData");
                 DatabaseProperties databaseProperties = new DatabaseProperties(
-                        SQLITE, null, null, null, null, null, null
+                        SQLITE, null, null, null, null, null, null, false
                 );
                 assertThat(databaseProperties).isNotNull().extracting("path").isEqualTo("ProgramData\\hlabmonitor\\monitor.db");
             }
@@ -73,7 +73,7 @@ class DatabasePropertiesTest {
                 systemMockedStatic.when(() -> SystemInterface.getProperty("os.name")).thenReturn("Windows");
                 systemMockedStatic.when(() -> SystemInterface.getEnv("ProgramData")).thenReturn(null);
                 DatabaseProperties databaseProperties = new DatabaseProperties(
-                        SQLITE, null, null, null, null, null, null
+                        SQLITE, null, null, null, null, null, null, false
                 );
                 assertThat(databaseProperties).isNotNull().extracting("path").isEqualTo("C:\\ProgramData\\hlabmonitor\\monitor.db");
             }

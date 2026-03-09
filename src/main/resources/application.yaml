@@ -4,6 +4,10 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
+logging:
+  level:
+    root: ERROR
+    be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.in.notification.LogSender: TRACE
 management:
   endpoint:
     health:
@@ -19,7 +23,6 @@ springdoc:
     enabled: false
   api-docs:
     enabled: false
-
 
 debug:
   controller:
