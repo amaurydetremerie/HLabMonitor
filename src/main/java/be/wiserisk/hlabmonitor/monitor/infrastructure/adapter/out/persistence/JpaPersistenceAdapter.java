@@ -194,6 +194,11 @@ public class JpaPersistenceAdapter implements PersistencePort {
         return notificationEntityRepository.countByNotificationStatus(SEND.name());
     }
 
+    @Override
+    public void deleteByNotificationId(Long notificationId) {
+        notificationEntityRepository.deleteById(notificationId);
+    }
+
     private List<Notification> toNotificationList(List<NotificationEntity> notificationEntityList) {
         return notificationEntityList.stream().map(notificationMapper::toDomain).toList();
     }

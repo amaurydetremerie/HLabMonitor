@@ -14,4 +14,6 @@ public interface ExecuteNotificationUseCase {
     void saveNotification(Notification notification);
 
     void resendNotification(TargetId targetId);
+
+    void deleteByNotificationId(Long notificationId);
 }

@@ -66,6 +66,12 @@ class JpaPersistenceAdapterTest {
     private NotificationMapper notificationMapper;
 
     @Test
+    void deleteByNotificationId() {
+        assertDoesNotThrow(() -> jpaPersistenceAdapter.deleteByNotificationId(1L));
+        verify(notificationEntityRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
     void countActiveNotifications() {
         when(notificationEntityRepository.countByNotificationStatus(SEND.name())).thenReturn(1);
         assertThat(jpaPersistenceAdapter.countActiveNotifications()).isEqualTo(1);

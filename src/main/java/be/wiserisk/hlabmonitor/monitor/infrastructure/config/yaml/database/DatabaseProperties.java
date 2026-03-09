@@ -14,7 +14,8 @@ public record DatabaseProperties(
         Integer port,
         String name,
         String username,
-        String password
+        String password,
+        boolean debug
 ) implements SystemInterface {
 
     @ConstructorBinding

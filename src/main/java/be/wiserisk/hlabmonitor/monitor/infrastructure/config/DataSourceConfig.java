@@ -101,7 +101,7 @@ public class DataSourceConfig {
         Map<String, Object> properties = new HashMap<>();
         properties.put("hibernate.hbm2ddl.auto", "none");
         properties.put("hibernate.dialect", databaseProperties.type().hibernateDialect);
-        properties.put("hibernate.show_sql", "true");
+        properties.put("hibernate.show_sql", databaseProperties.debug());
         properties.put("hibernate.format_sql", "true");
 
         em.setJpaPropertyMap(properties);

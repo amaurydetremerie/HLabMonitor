@@ -1,7 +1,8 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.config;
 
 import be.wiserisk.hlabmonitor.monitor.application.port.in.execution.ExecuteCheckUseCase;
-import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.in.rest.ExecuteCheckController;
+import be.wiserisk.hlabmonitor.monitor.application.port.in.execution.ExecuteNotificationUseCase;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.in.rest.DebugController;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +15,7 @@ public class DebugConfig {
             name = "debug.controller.enabled",
             havingValue = "true"
     )
-    public ExecuteCheckController executeCheckController(ExecuteCheckUseCase executeCheckUseCase) {
-        return new ExecuteCheckController(executeCheckUseCase);
+    public DebugController debugController(ExecuteCheckUseCase executeCheckUseCase, ExecuteNotificationUseCase executeNotificationUseCase) {
+        return new DebugController(executeCheckUseCase, executeNotificationUseCase);
     }
 }

@@ -1,6 +1,7 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.in.rest;
 
 import be.wiserisk.hlabmonitor.monitor.application.port.in.execution.ExecuteCheckUseCase;
+import be.wiserisk.hlabmonitor.monitor.application.port.in.execution.ExecuteNotificationUseCase;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,15 +18,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/debug/execute")
 @AllArgsConstructor
 @Tag(name = "Execute a check (debug only)")
-public class ExecuteCheckController {
+public class DebugController {
 
     private ExecuteCheckUseCase executeCheckUseCase;
+    private ExecuteNotificationUseCase executeNotificationUseCase;
 
     @Operation(summary = "Execute the check for a Target")
     @ApiResponse(responseCode = "202", description = "Accepted")
     @PostMapping("/{targetId}")
     public ResponseEntity<Void> executeByTargetId(@PathVariable String targetId) {
         executeCheckUseCase.executeCheck(new TargetId(targetId));
+        return ResponseEntity.accepted().build();
+    }
+
+    @Operation(summary = "Delete a notification")
+    @ApiResponse(responseCode = "202", description = "Accepted")
+    @PostMapping("/{notificationId}")
+    public ResponseEntity<Void> deleteByNotificationId(@PathVariable Long notificationId) {
+        executeNotificationUseCase.deleteByNotificationId(notificationId);
         return ResponseEntity.accepted().build();
     }
 
