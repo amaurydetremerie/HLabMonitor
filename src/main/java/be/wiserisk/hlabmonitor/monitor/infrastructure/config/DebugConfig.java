@@ -15,7 +15,7 @@ public class DebugConfig {
             name = "debug.controller.enabled",
             havingValue = "true"
     )
-    public DebugController executeCheckController(ExecuteCheckUseCase executeCheckUseCase, ExecuteNotificationUseCase executeNotificationUseCase) {
+    public DebugController debugController(ExecuteCheckUseCase executeCheckUseCase, ExecuteNotificationUseCase executeNotificationUseCase) {
         return new DebugController(executeCheckUseCase, executeNotificationUseCase);
     }
 }
