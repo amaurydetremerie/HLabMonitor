@@ -42,7 +42,6 @@ class H2Test {
     static void registerProperties(DynamicPropertyRegistry registry) {
         registry.add("database.type", () -> "h2");
 
-
         registry.add("monitoring.http.local.target", () -> "http://127.0.0.1:59814/actuator/health");
     }
 
@@ -50,7 +49,11 @@ class H2Test {
     void should_run_full_startup_process() {
         await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
             assertThat(targetEntityRepository.findAll()).hasSize(5);
+        });
+        await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
             assertThat(resultEntityRepository.findAll()).hasSize(5);
+        });
+        await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
             assertThat(notificationEntityRepository.findAll()).hasSize(1);
         });
     }

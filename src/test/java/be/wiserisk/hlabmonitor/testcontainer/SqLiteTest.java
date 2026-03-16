@@ -64,7 +64,11 @@ class SqLiteTest {
     void should_run_full_startup_process() {
         await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
             assertThat(targetEntityRepository.findAll()).hasSize(5);
+        });
+        await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
             assertThat(resultEntityRepository.findAll()).hasSize(5);
+        });
+        await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
             assertThat(notificationEntityRepository.findAll()).hasSize(1);
         });
     }
