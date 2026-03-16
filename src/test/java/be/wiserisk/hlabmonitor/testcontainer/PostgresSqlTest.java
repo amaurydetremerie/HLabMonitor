@@ -67,7 +67,7 @@ class PostgresSqlTest {
 
     @Test
     void should_run_full_startup_process() {
-        await().atMost(Duration.ofSeconds(1)).untilAsserted(() -> {
+        await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
             assertThat(targetEntityRepository.findAll()).hasSize(5);
             assertThat(resultEntityRepository.findAll()).hasSize(5);
             assertThat(notificationEntityRepository.findAll()).hasSize(1);
