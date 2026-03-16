@@ -20,8 +20,17 @@ public enum AppEnum {
     INFRASTRUCTURE("..monitor.infrastructure.."),
     ADAPTER("..monitor.infrastructure.adapter.."),
     ADAPTER_IN("..monitor.infrastructure.adapter.in.."),
+    ADAPTER_IN_REST("..monitor.infrastructure.adapter.in.rest.."),
+    ADAPTER_IN_NOTIFICATION("..monitor.infrastructure.adapter.in.notification.."),
     ADAPTER_OUT("..monitor.infrastructure.adapter.out.."),
+    ADAPTER_OUT_PERSISTENCE("..monitor.infrastructure.adapter.out.persistence.."),
+    ADAPTER_OUT_PERSISTENCE_CONVERTER("..monitor.infrastructure.adapter.out.persistence.converter.."),
+    ADAPTER_OUT_PERSISTENCE_ENTITY("..monitor.infrastructure.adapter.out.persistence.entity.."),
+    ADAPTER_OUT_PERSISTENCE_REPOSITORY("..monitor.infrastructure.adapter.out.persistence.repository.."),
+    ADAPTER_OUT_SCHEDULER("..monitor.infrastructure.adapter.out.scheduler.."),
     CONFIG("..monitor.infrastructure.config.."),
+    CONFIG_MAPPER("..monitor.infrastructure.config.mapper.."),
+    CONFIG_YAML("..monitor.infrastructure.config.yaml.."),
 
     STD_JAVA("java.."),
     STD_LOMBOK("lombok..");
