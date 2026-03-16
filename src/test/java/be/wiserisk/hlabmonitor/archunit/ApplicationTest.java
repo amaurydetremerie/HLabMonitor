@@ -1,31 +1,40 @@
 package be.wiserisk.hlabmonitor.archunit;
 
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
-import com.tngtech.archunit.junit.AnalyzeClasses;
-import com.tngtech.archunit.junit.ArchTest;
-import com.tngtech.archunit.lang.ArchRule;
+import org.junit.jupiter.api.Test;
 
 import static be.wiserisk.hlabmonitor.archunit.AppEnum.*;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
-@AnalyzeClasses(packages = "be.wiserisk.hlabmonitor", importOptions = ImportOption.DoNotIncludeTests.class)
-public class ApplicationTest {
+class ApplicationTest {
 
-    @ArchTest
-    static final ArchRule port =
-            classes()
-                    .that().resideInAPackage(PORTS.getStringPackage())
-                    .should().beInterfaces();
+    private final JavaClasses classes = new ClassFileImporter()
+            .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+            .importPackages("be.wiserisk.hlabmonitor");
 
-    @ArchTest
-    static final ArchRule port_in =
-            classes()
-                    .that().resideInAPackage(PORTS_IN.getStringPackage())
-                    .should().onlyHaveDependentClassesThat().resideInAnyPackage(DOMAIN_SERVICE.getStringPackage(), ADAPTER.getStringPackage(), CONFIG.getStringPackage());
+    @Test
+    void port() {
+        classes()
+                .that().resideInAPackage(PORTS.getStringPackage())
+                .should().beInterfaces()
+                .check(classes);
+    }
 
-    @ArchTest
-    static final ArchRule port_out =
-            classes()
-                    .that().resideInAPackage(PORTS_OUT.getStringPackage())
-                    .should().onlyDependOnClassesThat().resideInAnyPackage(PORTS_OUT.getStringPackage(), DOMAIN.getStringPackage(), STD_JAVA.getStringPackage());
+    @Test
+    void port_in() {
+        classes()
+                .that().resideInAPackage(PORTS_IN.getStringPackage())
+                .should().onlyHaveDependentClassesThat().resideInAnyPackage(DOMAIN_SERVICE.getStringPackage(), ADAPTER.getStringPackage(), CONFIG.getStringPackage())
+                .check(classes);
+    }
+
+    @Test
+    void port_out() {
+        classes()
+                .that().resideInAPackage(PORTS_OUT.getStringPackage())
+                .should().onlyDependOnClassesThat().resideInAnyPackage(PORTS_OUT.getStringPackage(), DOMAIN.getStringPackage(), STD_JAVA.getStringPackage())
+                .check(classes);
+    }
 }
