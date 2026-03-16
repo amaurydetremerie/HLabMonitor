@@ -69,10 +69,13 @@ public class DataSourceConfig {
     private DataSource configurePostgreSQL(DatabaseProperties databaseProperties) {
         HikariDataSource ds = new HikariDataSource();
         ds.setDriverClassName(databaseProperties.type().driverClassName);
-        ds.setJdbcUrl(String.format("jdbc:postgresql://%s:%d/%s",
-                databaseProperties.host(),
-                databaseProperties.port(),
-                databaseProperties.name()));
+        if(databaseProperties.jdbc() == null)
+            ds.setJdbcUrl(String.format("jdbc:postgresql://%s:%d/%s",
+                    databaseProperties.host(),
+                    databaseProperties.port(),
+                    databaseProperties.name()));
+        else
+            ds.setJdbcUrl(databaseProperties.jdbc());
         ds.setUsername(databaseProperties.username());
         ds.setPassword(databaseProperties.password());
         return ds;
@@ -81,10 +84,13 @@ public class DataSourceConfig {
     private DataSource configureSQLServer(DatabaseProperties databaseProperties) {
         HikariDataSource ds = new HikariDataSource();
         ds.setDriverClassName(databaseProperties.type().driverClassName);
-        ds.setJdbcUrl(String.format("jdbc:sqlserver://%s:%d;databaseName=%s",
-                databaseProperties.host(),
-                databaseProperties.port(),
-                databaseProperties.name()));
+        if(databaseProperties.jdbc() == null)
+            ds.setJdbcUrl(String.format("jdbc:sqlserver://%s:%d;databaseName=%s;trustServerCertificate=true",
+                    databaseProperties.host(),
+                    databaseProperties.port(),
+                    databaseProperties.name()));
+        else
+            ds.setJdbcUrl(databaseProperties.jdbc());
         ds.setUsername(databaseProperties.username());
         ds.setPassword(databaseProperties.password());
         return ds;

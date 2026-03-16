@@ -1,0 +1,15 @@
+database: {}
+monitoring:
+  notification:
+    log:
+      level: INFO
+  ping:
+    local:
+      target: 127.0.0.1
+    fail:
+      target: 0.0.0.0
+  http:
+    local:
+      ssl: false
+    google:
+      target: https://google.com
