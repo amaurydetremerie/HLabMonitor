@@ -44,6 +44,7 @@ jobs:
         run: |
           mvn clean verify
           mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dskip.testcontainer.tests=true  \
             -Dsonar.projectKey=amaurydetremerie_HLabMonitor_e3531c7a-c5fc-4601-ba3c-689615a3d98b \
             -Dsonar.projectName='HLabMonitor' \
             -Dsonar.qualitygate.wait=true \
