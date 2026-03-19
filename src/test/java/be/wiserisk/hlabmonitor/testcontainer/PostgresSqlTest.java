@@ -69,15 +69,15 @@ class PostgresSqlTest {
 
     @Test
     void should_run_full_startup_process() {
-        await().atMost(Duration.ofMinutes(2)).untilAsserted(() -> {
+        await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
             assertThat(targetEntityRepository.findAll()).hasSize(5);
             System.out.println("notif : " + targetEntityRepository.findAll().size() + " -> " + targetEntityRepository.findAll());
         });
-        await().atMost(Duration.ofMinutes(2)).untilAsserted(() -> {
+        await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
             assertThat(resultEntityRepository.findAll()).hasSize(5);
             System.out.println("notif : " + resultEntityRepository.findAll().size() + " -> " + resultEntityRepository.findAll());
         });
-        await().atMost(Duration.ofMinutes(2)).untilAsserted(() -> {
+        await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
             assertThat(notificationEntityRepository.findAll()).hasSize(1);
             System.out.println("notif : " + notificationEntityRepository.findAll().size() + " -> " + notificationEntityRepository.findAll());
         });

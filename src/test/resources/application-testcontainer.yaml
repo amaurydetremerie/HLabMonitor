@@ -7,7 +7,7 @@ monitoring:
     local:
       target: 127.0.0.1
     fail:
-      target: 0.0.0.0
+      target: 10.255.255.1
   http:
     local:
       ssl: false
