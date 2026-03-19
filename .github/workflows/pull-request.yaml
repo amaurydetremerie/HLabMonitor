@@ -82,10 +82,5 @@ jobs:
           sudo mkdir -p /var/lib/hlabmonitor
           sudo chown -R $USER:$USER /var/lib/hlabmonitor
 
-      - name: Setup Testcontainers Cloud Client
-        uses: atomicjar/testcontainers-cloud-setup-action@v1
-        with:
-          token: ${{ secrets.TC_CLOUD_TOKEN }}
-
       - name: TestContainer
         run: mvn verify -P testcontainer
