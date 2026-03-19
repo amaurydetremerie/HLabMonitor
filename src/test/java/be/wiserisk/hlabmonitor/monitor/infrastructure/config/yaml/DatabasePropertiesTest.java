@@ -147,6 +147,30 @@ class DatabasePropertiesTest {
 
     @Nested
     @SpringBootTest(classes = DatabasePropertiesTest.TestConfig.class)
+    @ActiveProfiles({"test", "db-postgresql-jdbc"})
+    class PostgreSQLJdbcTest {
+        @Autowired
+        private DatabaseProperties databaseProperties;
+
+        @Test
+        void shouldCreatePostgreSQLJdbcConfiguration() {
+            assertThat(databaseProperties)
+                    .isNotNull()
+                    .extracting("type", "jdbc", "username", "password")
+                    .isEqualTo(List.of(POSTGRESQL, "jdbcString", "testuser", "testpass"));
+        }
+
+        @Test
+        void shouldHaveCorrectPostgreSQLDialectAndDriver() {
+            assertThat(databaseProperties.type())
+                    .isNotNull()
+                    .extracting("hibernateDialect", "driverClassName")
+                    .isEqualTo(List.of("org.hibernate.dialect.PostgreSQLDialect", "org.postgresql.Driver"));
+        }
+    }
+
+    @Nested
+    @SpringBootTest(classes = DatabasePropertiesTest.TestConfig.class)
     @ActiveProfiles({"test", "db-postgresql-minimal"})
     class PostgreSQLMinimalTest {
         @Autowired
@@ -182,6 +206,30 @@ class DatabasePropertiesTest {
                     .isNotNull()
                     .extracting("type", "host", "port", "name", "username", "password")
                     .isEqualTo(List.of(POSTGRESQL, "db.example.com", 5433, "production_db", "produser", "prodpass"));
+        }
+    }
+
+    @Nested
+    @SpringBootTest(classes = DatabasePropertiesTest.TestConfig.class)
+    @ActiveProfiles({"test", "db-sqlserver-jdbc"})
+    class SQLServerJdbcTest {
+        @Autowired
+        private DatabaseProperties databaseProperties;
+
+        @Test
+        void shouldCreateSQLServerMinimalConfiguration() {
+            assertThat(databaseProperties)
+                    .isNotNull()
+                    .extracting("type", "jdbc", "username", "password")
+                    .isEqualTo(List.of(SQLSERVER, "jdbcString", "sa", "TestPassword123"));
+        }
+
+        @Test
+        void shouldHaveCorrectSQLServerDialectAndDriver() {
+            assertThat(databaseProperties.type())
+                    .isNotNull()
+                    .extracting("hibernateDialect", "driverClassName")
+                    .isEqualTo(List.of("org.hibernate.dialect.SQLServerDialect", "com.microsoft.sqlserver.jdbc.SQLServerDriver"));
         }
     }
 
