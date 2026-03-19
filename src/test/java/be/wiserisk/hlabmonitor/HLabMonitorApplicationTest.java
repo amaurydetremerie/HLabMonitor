@@ -29,8 +29,28 @@ class HLabMonitorApplicationTest {
 
     @Nested
     @SpringBootTest
+    @ActiveProfiles({"test", "db-postgresql-jdbc"})
+    class HLabMonitorApplicationTestPostgreSQLJdbc {
+        @Test
+        void contextLoads() {
+            // Method to verify if the context can load
+        }
+    }
+
+    @Nested
+    @SpringBootTest
     @ActiveProfiles({"test", "db-postgresql-minimal"})
     class HLabMonitorApplicationTestPostgreSQL {
+        @Test
+        void contextLoads() {
+            // Method to verify if the context can load
+        }
+    }
+
+    @Nested
+    @SpringBootTest
+    @ActiveProfiles({"test", "db-sqlserver-jdbc"})
+    class HLabMonitorApplicationTestSQLServerJdbc {
         @Test
         void contextLoads() {
             // Method to verify if the context can load

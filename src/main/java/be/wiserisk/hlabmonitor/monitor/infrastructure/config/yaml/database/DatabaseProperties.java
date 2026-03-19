@@ -15,7 +15,8 @@ public record DatabaseProperties(
         String name,
         String username,
         String password,
-        boolean debug
+        boolean debug,
+        String jdbc
 ) implements SystemInterface {
 
     @ConstructorBinding

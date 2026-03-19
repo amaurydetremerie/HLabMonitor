@@ -12,7 +12,7 @@ databaseChangeLog:
                   autoIncrement: true
                   constraints:
                     primaryKey: true
-                    primaryKeyName: pk_result
+                    primaryKeyName: pk_notification_result
                     nullable: false
               - column:
                   name: target_id

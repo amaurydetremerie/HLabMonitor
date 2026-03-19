@@ -1,0 +1,5 @@
+database:
+  type: postgresql
+  username: testuser
+  password: testpass
+  jdbc: jdbcString
