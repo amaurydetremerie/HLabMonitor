@@ -3,8 +3,8 @@ package be.wiserisk.hlabmonitor.testcontainer;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.NotificationEntityRepository;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.ResultEntityRepository;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.TargetEntityRepository;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -24,7 +24,7 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
                 "server.port=59814"
         })
 @ActiveProfiles("testcontainer")
-@DisabledIfSystemProperty(named = "skip.testcontainer.tests", matches = "true")
+@Tag("testcontainer")
 class H2Test {
 
     @Autowired

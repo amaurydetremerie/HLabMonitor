@@ -5,8 +5,8 @@ import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.re
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.repository.TargetEntityRepository;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -30,7 +30,7 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
                 "server.port=59813"
         })
 @ActiveProfiles("testcontainer")
-@DisabledIfSystemProperty(named = "skip.testcontainer.tests", matches = "true")
+@Tag("testcontainer")
 class SqLiteTest {
 
     @Autowired
