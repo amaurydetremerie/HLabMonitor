@@ -40,21 +40,6 @@ class SqLiteTest {
     @Autowired
     private NotificationEntityRepository notificationEntityRepository;
 
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer postgres =
-            new PostgreSQLContainer(DockerImageName.parse("postgres:16-alpine"));
-
-    @BeforeAll
-    static void beforeAll() {
-        postgres.start();
-    }
-
-    @AfterAll
-    static void afterAll() {
-        postgres.stop();
-    }
-
     @DynamicPropertySource
     static void registerProperties(DynamicPropertyRegistry registry) {
         registry.add("database.type", () -> "sqlite");
