@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -16,7 +15,6 @@ import java.util.concurrent.CompletableFuture;
 public class CommandLineRunnerConfiguration {
 
     @Bean
-    @Profile("!testcontainer")
     public CommandLineRunner monitoringConfigSyncRunner(
             Monitoring monitoring,
             ManageMonitoringConfigUseCase manageMonitoringConfigUseCase,
@@ -25,15 +23,5 @@ public class CommandLineRunnerConfiguration {
                 CompletableFuture.runAsync(() ->
                         manageMonitoringConfigUseCase.syncFullConfiguration(monitoringToTargetAdapter.extractTargets(monitoring)))
                         .exceptionally(e -> { log.error("An exception occured when running syncFullConfiguration", e); return null; });
-    }
-
-    @Bean
-    @Profile("testcontainer")
-    public CommandLineRunner monitoringConfigSyncRunnerSync(
-            Monitoring monitoring,
-            ManageMonitoringConfigUseCase manageMonitoringConfigUseCase,
-            MonitoringToTargetAdapter monitoringToTargetAdapter) {
-        return args -> manageMonitoringConfigUseCase
-                .syncFullConfiguration(monitoringToTargetAdapter.extractTargets(monitoring));
     }
 }
