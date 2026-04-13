@@ -1,368 +1,297 @@
 # Application YAML Reference
 
-This document describes all custom configuration properties available in HLabMonitor's `application.yaml` file. Standard Spring Boot properties (like `server.port`, `spring.application.name`, etc.) are not covered here.
+This document covers all custom configuration properties for HLabMonitor. Standard Spring Boot properties (`server.port`, `spring.datasource`, etc.) are not repeated here unless they interact with HLabMonitor-specific behaviour.
 
-## Table of Contents
+## Configuration Locations and Priority
 
-- [Database Configuration](#database-configuration)
-- [Monitoring Configuration](#monitoring-configuration)
-  - [Ping Monitoring](#ping-monitoring)
-  - [HTTP Monitoring](#http-monitoring)
-  - [SSL Certificate Monitoring](#ssl-certificate-monitoring)
-- [Debug Configuration](#debug-configuration)
+HLabMonitor applies properties in the following order (highest priority first):
+
+1. Environment variables (e.g. `HLABMONITOR_DATABASE_TYPE=postgresql`)
+2. File at `HLABMONITOR_CONFIG_LOCATION` environment variable
+3. `/etc/hlabmonitor/application.yaml`
+4. Defaults embedded in the JAR
 
 ---
 
-## Database Configuration
+## `database` Configuration
 
-The `database` section configures the persistence layer for HLabMonitor. By default, an **H2 in-memory database** is used, but SQLite, PostgreSQL, and SQL Server are also supported.
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `database.type` | enum | `h2` | `h2` \| `sqlite` \| `postgresql` \| `sqlserver` |
+| `database.path` | string | platform-specific | SQLite file path. Linux: `/var/lib/hlabmonitor/monitor.db`; Windows: `%ProgramData%\hlabmonitor\monitor.db` |
+| `database.host` | string | `localhost` | Server host (PostgreSQL, SQL Server) |
+| `database.port` | integer | `5432` / `1433` | Auto-set per type if omitted |
+| `database.name` | string | `monitor` | Database name |
+| `database.username` | string | — | DB username |
+| `database.password` | string | — | DB password |
+| `database.debug` | boolean | `false` | Enable JDBC debug logging |
+| `database.jdbc` | string | — | Custom JDBC URL — overrides all other `database.*` properties |
 
-### Properties
+**H2 (default):** No configuration needed. Data is not persisted between restarts.
 
-| Property | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
-| `type` | enum | No | `h2` | Database type: `h2`, `sqlite`, `postgresql`, or `sqlserver` |
-| `path` | string | No | Platform-specific | File path for SQLite database (see below for defaults) |
-| `host` | string | No | `localhost` | Database server hostname (PostgreSQL, SQL Server) |
-| `port` | integer | No | Type-specific | Database server port (5432 for PostgreSQL, 1433 for SQL Server) |
-| `name` | string | No | `monitor` | Database name |
-| `username` | string | No | - | Database username (PostgreSQL, SQL Server) |
-| `password` | string | No | - | Database password (PostgreSQL, SQL Server) |
-
-### Default SQLite Paths
-
-- **Windows**: `C:\ProgramData\hlabmonitor\monitor.db`
-- **Linux/Unix**: `/var/lib/hlabmonitor/monitor.db`
-
-### Examples
-
-#### H2 (Default)
-
-No configuration needed. H2 is used automatically if no `database` section is provided.
-
-``` yaml
-# No database configuration = H2 in-memory
-```
-
-#### SQLite - Minimal
-
-``` yaml
+```yaml
 database:
   type: sqlite
+  path: /opt/hlabmonitor/monitor.db
 ```
 
-#### SQLite - Custom Path
-
-``` yaml
-database:
-  type: sqlite
-  path: /opt/monitoring/data/monitor.db
-```
-
-#### PostgreSQL - Minimal
-
-``` yaml
-database:
-  type: postgresql
-  username: monitor
-  password: secure_password
-```
-
-#### PostgreSQL - Full
-
-``` yaml
-database:
-  type: postgresql
-  host: db.example.com
-  port: 5433
-  name: production_db
-  username: produser
-  password: prodpass
-```
-
-#### SQL Server - Minimal
-
-``` yaml
-database:
-  type: sqlserver
-  username: monitor
-  password: secure_password
-```
-
-#### SQL Server - Full
-
-``` yaml
-database:
-  type: sqlserver
-  host: sqlserver.example.com
-  port: 14331
-  name: MonitorDB
-  username: dbadmin
-  password: AdminPassword456
-```
-
----
-
-## Monitoring Configuration
-
-The `monitoring` section defines all targets to monitor. Each target is identified by a unique key and can be either a **ping** check or an **HTTP** check.
-
-### Ping Monitoring
-
-Ping checks use ICMP to verify network connectivity to a target.
-
-#### Properties
-
-| Property | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
-| `target` | string | Yes | - | IP address or hostname to ping |
-| `interval` | duration | No | `5m` | Check interval (supports `s`, `m`, `h`, `d`, `w` suffixes) |
-
-#### Example
-
-``` yaml
-monitoring:
-  ping:
-    gateway:
-      target: 192.168.1.1
-      interval: 1m
-
-    dns-server:
-      target: 8.8.8.8
-      interval: 30s
-    
-    remote-host:
-      target: example.com
-      # Uses default interval of 5m
-```
-
-### HTTP Monitoring
-
-HTTP checks verify web service availability and response.
-
-#### Properties
-
-| Property       | Type    | Required | Default | Description                                                      |
-|----------------|---------|----------|---------|------------------------------------------------------------------|
-| `target`       | string  | Yes | -       | URL or hostname to check (protocol auto-detected based on `ssl`) |
-| `interval`     | duration | No | `10m`   | Check interval (supports `s`, `m`, `h`, `d`, `w` suffixes)       |
-| `status-code`  | integer | No | -| Status code other than 2xx when target is up                     |
-| `ssl`          | boolean | No | `true`  | Enable HTTPS (true) or HTTP (false)                              |
-| `certificate`  | object  | No | -       | SSL certificate monitoring configuration (see below)             |
-
-#### Example
-
-``` yaml
-monitoring:
-  http:
-    website:
-      target: www.example.com
-      interval: 5m
-      ssl: true
-
-    api:
-      target: api.internal.local
-      interval: 1m
-      ssl: false
-    
-    secured:
-      target: api.internal.local
-      status-code: 401
-    
-    service:
-      target: service.example.com
-      # Uses default interval of 10m
-      # Uses default ssl: true
-```
-
-### SSL Certificate Monitoring
-
-When `ssl: true` (default), you can optionally configure certificate expiration monitoring. This creates an additional **certificate check** for the target.
-
-#### Certificate Properties
-
-| Property | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
-| `verify` | boolean | No | `true` | Enable certificate expiration monitoring |
-| `interval` | duration | No | Inherits from parent HTTP check | Certificate check interval |
-
-> **Note**: When `verify: true`, a separate certificate target is automatically created with the suffix `:certificate` (e.g., `website:certificate`).
-
-#### Examples
-
-##### HTTPS with Certificate Monitoring (Full Configuration)
-
-``` yaml
-monitoring:
-  http:
-    secure-site:
-      target: www.example.com
-      interval: 10m
-      ssl: true
-      certificate:
-        verify: true
-        interval: 1d
-```
-
-This creates:
-- `secure-site` - HTTP check every 10 minutes
-- `secure-site:certificate` - Certificate expiration check every 1 day
-
-##### HTTPS with Certificate Monitoring (Minimal)
-
-``` yaml
-monitoring:
-  http:
-    secure-site:
-      target: www.example.com
-      certificate:
-        verify: true
-```
-
-This creates:
-- `secure-site` - HTTP check every 10 minutes (default)
-- `secure-site:certificate` - Certificate check every 10 minutes (inherits from HTTP check)
-
-##### HTTPS without Certificate Monitoring
-
-``` yaml
-monitoring:
-  http:
-    no-cert-check:
-      target: www.example.com
-      ssl: true
-      certificate:
-        verify: false
-```
-
-This creates only the HTTP check, no certificate monitoring.
-
-##### HTTP (No SSL)
-
-``` yaml
-monitoring:
-  http:
-    plain-http:
-      target: api.internal.local
-      ssl: false
-      certificate:
-        verify: true  # Ignored - no certificate on HTTP
-        interval: 1d
-```
-
-Certificate configuration is ignored when `ssl: false`.
-
-### Complete Monitoring Example
-
-``` yaml
-monitoring:
-  ping:
-    router:
-      target: 192.168.1.1
-      interval: 30s
-
-    public-dns:
-      target: 1.1.1.1
-      interval: 1m
-
-  http:
-    production-web:
-      target: www.production.com
-      interval: 5m
-      ssl: true
-      certificate:
-        verify: true
-        interval: 1d
-
-    internal-api:
-      target: api.internal.lan
-      interval: 2m
-      ssl: false
-    
-    monitoring-dashboard:
-      target: grafana.local
-      ssl: true
-      # Certificate monitoring enabled with default interval
-      certificate:
-        verify: true
-```
-
----
-
-## Debug Configuration
-
-### Debug Controller
-
-The `debug.controller.enabled` property enables a REST controller for manually triggering monitoring checks (ping or HTTP).
-
-#### Properties
-
-| Property | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
-| `debug.controller.enabled` | boolean | No | `false` | Enable debug REST endpoints for manual check execution |
-
-#### Example
-
-``` yaml
-debug:
-  controller:
-    enabled: true
-```
-
-> **Warning**: This should only be enabled in development or testing environments, not in production.
-
----
-
-## Interval Format
-
-All `interval` properties support duration strings with the following suffixes:
-
-| Suffix | Unit | Example | Duration |
-|--------|------|---------|----------|
-| `s` | Seconds | `30s` | 30 seconds |
-| `m` | Minutes | `5m` | 5 minutes |
-| `h` | Hours | `2h` | 2 hours |
-| `d` | Days | `1d` | 1 day |
-| `w` | Weeks | `2w` | 2 weeks |
-
-If an invalid or empty interval is provided, the default for that check type is used (5m for ping, 10m for HTTP).
-
----
-
-## Complete Example
-
-``` yaml
+```yaml
 database:
   type: postgresql
   host: postgres.local
   port: 5432
   name: hlabmonitor
   username: monitor_user
-  password: secure_password
+  password: secret
+```
+
+---
+
+## `monitoring` Configuration
+
+Defines all targets to check. Each entry uses a user-chosen key.
+
+**Generated target IDs:** `<key>:ping`, `<key>:http`, `<key>:certificate`
+Example: key `my-server` → targets `my-server:ping`, `my-server:http`, `my-server:certificate`.
+
+### `monitoring.ping`
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `<key>.target` | string | required | IPv4, IPv6 address or hostname to ping |
+| `<key>.interval` | duration | `5m` | Check interval. Suffixes: `s`, `m`, `h`, `d`, `w` |
+
+```yaml
+monitoring:
+  ping:
+    router:
+      target: 192.168.1.1
+      interval: 30s
+    google-dns:
+      target: 8.8.8.8
+      # interval defaults to 5m
+```
+
+### `monitoring.http`
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `<key>.target` | string | required | Hostname or URL. Protocol (`http://`/`https://`) is auto-prepended based on `ssl` |
+| `<key>.interval` | duration | `10m` | Check interval |
+| `<key>.ssl` | boolean | `true` | `true` = HTTPS, `false` = HTTP |
+| `<key>.status-code` | integer | — | Acceptable HTTP status in addition to 2xx (e.g. `401`) |
+| `<key>.internal` | boolean | `false` | Use internal RestClient; sets type to `HTTP_INTERNAL` |
+| `<key>.certificate.verify` | boolean | `true` | Enable SSL certificate expiration monitoring |
+| `<key>.certificate.interval` | duration | `1d` | Certificate check interval |
+
+> **Default certificate behaviour:** When `ssl: true` (the default) and no `certificate` block is specified, certificate monitoring is **automatically created** with a 1-day interval. To disable it, set `certificate.verify: false` explicitly.
+
+```yaml
+monitoring:
+  http:
+    my-website:
+      target: example.com        # → https://example.com
+      interval: 5m
+      ssl: true
+      certificate:
+        verify: true
+        interval: 7d
+
+    internal-api:
+      target: my.internal.service
+      interval: 1m
+      ssl: false                 # → http://
+      internal: true             # type = HTTP_INTERNAL
+
+    protected-endpoint:
+      target: api.example.com
+      status-code: 401           # 401 is considered SUCCESS
+
+    no-cert-monitoring:
+      target: other.example.com
+      ssl: true
+      certificate:
+        verify: false            # disable cert check despite ssl: true
+```
+
+### `monitoring.notification`
+
+Global notification settings. Each channel can be toggled independently.
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `enabled` | boolean | `true` | Master switch for all notification channels |
+
+#### `monitoring.notification.email`
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `enabled` | boolean | `true` | Enable email notifications |
+| `from` | string | **required** | Sender address — `NullPointerException` if absent when enabled |
+| `to` | string | same as `from` | Recipient address |
+| `firing` | boolean | `true` | Send on FIRING (result family → FAILURE) |
+| `resolved` | boolean | `true` | Send on RESOLVED (result family → SUCCESS) |
+| `failed` | boolean | `true` | Send if notification dispatch fails |
+| `smtp.host` | string | `localhost` | SMTP server |
+| `smtp.port` | integer | `587` | SMTP port |
+| `smtp.username` | string | `""` | SMTP username |
+| `smtp.password` | string | `""` | SMTP password |
+| `smtp.auth` | boolean | `true` | Enable SMTP authentication |
+| `smtp.tls` | boolean | `true` | Enable STARTTLS |
+
+```yaml
+monitoring:
+  notification:
+    email:
+      enabled: true
+      from: hlabmonitor@example.com
+      to: alerts@example.com
+      smtp:
+        host: smtp.example.com
+        port: 587
+        username: hlabmonitor
+        password: secret
+        auth: true
+        tls: true
+```
+
+#### `monitoring.notification.discord`
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `enabled` | boolean | `true` | Enable Discord notifications |
+| `webhook-url` | string | **required** | Discord webhook URL |
+| `firing` | boolean | `true` | Send on FIRING |
+| `resolved` | boolean | `true` | Send on RESOLVED |
+| `failed` | boolean | `true` | Send on dispatch error |
+
+```yaml
+monitoring:
+  notification:
+    discord:
+      enabled: true
+      webhook-url: https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN
+```
+
+#### `monitoring.notification.telegram`
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `enabled` | boolean | `true` | Enable Telegram notifications |
+| `token` | string | **required** | Bot API token |
+| `chat-id` | string | **required** | Target chat ID (channel or group) |
+| `firing` | boolean | `true` | Send on FIRING |
+| `resolved` | boolean | `true` | Send on RESOLVED |
+| `failed` | boolean | `true` | Send on dispatch error |
+
+```yaml
+monitoring:
+  notification:
+    telegram:
+      enabled: true
+      token: YOUR_BOT_TOKEN
+      chat-id: "-123456789"
+```
+
+#### `monitoring.notification.log`
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `enabled` | boolean | `true` | Enable log notifications |
+| `level` | LogLevel | **required** | `ERROR` \| `WARN` \| `INFO` \| `DEBUG` \| `TRACE` — must be set explicitly |
+| `firing` | boolean | `true` | Log on FIRING |
+| `resolved` | boolean | `true` | Log on RESOLVED |
+| `failed` | boolean | `true` | Log on dispatch error |
+
+> **Note:** Root logger level is `ERROR` by default. Set `logging.level.root: INFO` if log notifications at lower levels should appear in output.
+
+```yaml
+monitoring:
+  notification:
+    log:
+      enabled: true
+      level: INFO
+```
+
+---
+
+## `debug` Configuration
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `debug.controller.enabled` | boolean | `false` | Expose debug REST endpoints at `/api/debug/execute/*` |
+
+> **Warning:** Only enable in development or testing. The debug controller has no authentication.
+
+```yaml
+debug:
+  controller:
+    enabled: true
+```
+
+---
+
+## Interval Format
+
+All `interval` fields accept:
+
+| Suffix | Unit | Example |
+|--------|------|---------|
+| `s` | seconds | `30s` |
+| `m` | minutes | `5m` |
+| `h` | hours | `2h` |
+| `d` | days | `1d` |
+| `w` | weeks | `2w` |
+
+Invalid or empty values fall back to the type default (`5m` for ping, `10m` for HTTP, `1d` for certificate).
+
+---
+
+## Full Example
+
+```yaml
+database:
+  type: postgresql
+  host: postgres.local
+  name: hlabmonitor
+  username: monitor_user
+  password: secret
 
 monitoring:
   ping:
-    gateway:
+    router:
       target: 192.168.1.1
       interval: 30s
 
-    internet:
-      target: 8.8.8.8
-      interval: 1m
-
   http:
-    website:
-      target: www.example.com
+    my-site:
+      target: example.com
       interval: 5m
       ssl: true
       certificate:
         verify: true
         interval: 1d
-
-    api:
-      target: api.internal.local
-      interval: 2m
+    internal:
+      target: api.local
       ssl: false
+      interval: 1m
+
+  notification:
+    email:
+      enabled: true
+      from: monitor@example.com
+      smtp:
+        host: smtp.example.com
+        port: 587
+        username: monitor
+        password: secret
+    discord:
+      enabled: false
+    telegram:
+      enabled: false
+    log:
+      enabled: true
+      level: INFO
 
 debug:
   controller:

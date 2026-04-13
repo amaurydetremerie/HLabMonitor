@@ -1,122 +1,136 @@
 # HLabMonitor
 
-> Comprehensive monitoring solution for your HomeLab
+> Monitoring solution for your HomeLab
 
 [![Docker Image](https://img.shields.io/docker/v/wiserisk/hlabmonitor?label=Docker)](https://hub.docker.com/r/wiserisk/hlabmonitor)
 [![Latest Release](https://img.shields.io/github/v/release/amaurydetremerie/HLabMonitor)](https://github.com/amaurydetremerie/HLabMonitor/releases)
 [![License](https://img.shields.io/github/license/amaurydetremerie/HLabMonitor)](LICENSE)
 
-HLabMonitor is a Spring Boot application designed to monitor and manage your HomeLab infrastructure, providing real-time metrics, database monitoring, and extensive integration capabilities.
+HLabMonitor is a Spring Boot application (v4.0.1, Java 21) designed to monitor your HomeLab infrastructure. It performs periodic checks on network targets, tracks results, and sends notifications when service health changes.
 
 ## Features
 
-- 📊 Real-time monitoring and metrics collection
-- 🗄️ Multi-database support (PostgreSQL, H2, SQLite, SQL Server)
-- 🔌 REST API with OpenAPI/Swagger documentation
-- 📈 Spring Boot Actuator integration
-- 🐳 Multiple deployment options (Docker, Kubernetes, systemd)
-- 🔄 Database migrations with Liquibase
-- 🔒 Security-focused design
+- **PING (ICMP)** — IPv4 and IPv6, 5s timeout
+- **HTTP/HTTPS GET** — status code verification (2xx or custom), internal RestClient mode
+- **SSL Certificate monitoring** — X.509 expiration checks, auto-created for every HTTPS target
+- **Built-in notifications** — Discord, Email (SMTP), Telegram, Log, Prometheus metrics, SSE stream
+- **REST API** — full CRUD for targets, paginated results, live notification stream
+- **Multi-database** — H2 (default, in-memory), SQLite, PostgreSQL, SQL Server via Liquibase
+- **Multiple deployment options** — Docker, DEB/RPM packages, standalone JAR
+
+> **SPEEDTEST** is declared in the codebase but not yet implemented (`UnsupportedOperationException`).
 
 ## Quick Start
 
 ```bash
-# Docker (easiest way to get started)
-docker run -d -p 8080:8080 wiserisk/hlabmonitor:latest
-
-# Access the application
-open http://localhost:8080
+docker run -d \
+  --name hlabmonitor \
+  -p 8080:8080 \
+  -v hlabmonitor-data:/etc/hlabmonitor \
+  wiserisk/hlabmonitor:latest
 ```
 
-**That's it!** HLabMonitor is now running with an embedded H2 database.
+HLabMonitor starts with an H2 in-memory database (data lost on restart). Place an `application.yaml` in the mounted volume to configure monitoring targets and notifications.
 
-Access the Swagger UI at http://localhost:8080/swagger-ui.html
+> **Note:** Swagger UI and API docs are **disabled by default**. Enable them with `springdoc.swagger-ui.enabled: true` and `springdoc.api-docs.enabled: true`.
+
+> **Security:** The REST API has **no authentication** by default. Restrict network access appropriately.
 
 ## Installation Options
 
-Choose the installation method that best fits your environment:
-
-| Method | Best For | Documentation                                   |
-|--------|----------|-------------------------------------------------|
-| 🐳 **Docker** | Quick testing, containerized environments | [Docker Guide](docs/installation/docker.md)     |
-| ☸️ **Kubernetes** | Production clusters, orchestration | [Kubernetes Guide](docs/installation/kubernetes.md) |
-| 🔄 **ArgoCD** | GitOps workflows | [ArgoCD Guide](docs/installation/argocd.md)     |
-| 📦 **DEB Package** | Debian/Ubuntu servers | [Debian/Ubuntu Guide](docs/installation/deb.md) |
-| 📦 **RPM Package** | RHEL/Fedora/Rocky servers | [RHEL/Fedora Guide](docs/installation/rpm.md)   |
-| ☕ **Standalone JAR** | Any platform with Java 21+ | [JAR Guide](docs/installation/standalone.md)    |
+| Method | Best For | Documentation |
+|--------|----------|---------------|
+| Docker | Containers, quick start | [Docker Guide](docs/installation/docker.md) |
+| DEB Package | Debian/Ubuntu | [Debian/Ubuntu Guide](docs/installation/deb.md) |
+| RPM Package | RHEL/Fedora/Rocky | [RHEL/Fedora Guide](docs/installation/rpm.md) |
+| Standalone JAR | Any platform (Java 21+) | [JAR Guide](docs/installation/standalone.md) |
 
 ## Documentation
 
 ### Configuration
-- 📝 [Application YAML Reference](docs/configuration/application-yaml.md) - Complete configuration options
-- 🔧 [Environment Variables](docs/configuration/environment-variables.md) - Override configuration
-- 🗄️ [Database Setup](docs/configuration/database.md) - PostgreSQL, SQL Server, SQLite
+- [Application YAML Reference](docs/configuration/application-yaml.md) — all config properties
+- [Database Setup](docs/configuration/database.md) — PostgreSQL, SQL Server, SQLite
+
+### Monitoring & Notifications
+- [Notification System](docs/monitoring/notifications.md) — Discord, Email, Telegram, Log, SSE, Prometheus
 
 ### Deployment
-- 🐳 [Docker Compose Examples](docs/deployment/docker-compose.md)
-- ☸️ [Kubernetes Manifests](docs/deployment/kubernetes-manifests.md)
-- ✅ [Production Checklist](docs/deployment/production-checklist.md)
-
-### Monitoring & Operations
-- 📊 [Metrics & Monitoring](docs/monitoring/metrics.md)
-- 📋 [Logging](docs/monitoring/logs.md)
-- 🚨 [Alerting](docs/monitoring/alerting.md)
+- [Docker Compose Examples](docs/deployment/docker-compose.md)
+- [Kubernetes Manifests](docs/deployment/kubernetes-manifests.md)
+- [Production Checklist](docs/deployment/production-checklist.md)
 
 ### Development
-- 🏗️ [Building from Source](docs/development/building.md)
-- 🤝 [Contributing Guide](docs/development/contributing.md)
-- 🏛️ [Architecture Overview](docs/development/architecture.md)
+- [Architecture Overview](docs/development/architecture.md)
+- [Building from Source](docs/development/building.md)
+- [Contributing Guide](docs/development/contributing.md)
 
 ### Help
-- 🔍 [Troubleshooting](docs/troubleshooting/common-issues.md)
-- ❓ [FAQ](docs/troubleshooting/faq.md)
+- [Troubleshooting](docs/troubleshooting/common-issues.md)
+- [FAQ](docs/troubleshooting/faq.md)
 
-## Requirements
+## API Endpoints
 
-- **Java**: OpenJDK/Temurin/Corretto 21+
-- **Databases** (optional): PostgreSQL, SQL Server, SQLite (H2 embedded by default)
-- **Container Runtime** (optional): Docker, Podman, containerd
+**Base URL:** `http://localhost:8080/api/v1`
 
-## API & Endpoints
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/targets` | All target IDs |
+| `GET` | `/targets/{monitoringType}` | Target IDs by type (`PING`, `HTTP`, `CERTIFICATE`, `HTTP_INTERNAL`) |
+| `GET` | `/results` | All results |
+| `GET` | `/results/{targetId}` | Results for one target (404 if unknown) |
+| `GET` | `/results/search` | Paginated filtered results (`from`, `to`, `targetIdList`, `monitoringResultList`, `monitoringTypeList`, `size`=20, `page`=0) |
+| `GET` | `/notifications` | Active notifications (status `SEND`) |
+| `GET` | `/notifications/count` | Count of active notifications |
+| `GET` | `/notifications/stream` | SSE stream — event: `notifications-count-update` |
+| `GET` | `/management/stats` | Statistics (optional `statisticTypes[]`). Note: `NOTIFICATION_SEND` and `NOTIFICATION_TRIGGER` return `-1L` (not yet implemented) |
+| `POST` | `/management` | Add a target (body: `Target` JSON) → 202 |
+| `PUT` | `/management/` | Update a target (body: `Target` JSON) → 202 |
+| `POST` | `/management/{targetId}/stop` | Stop monitoring for a target → 202 |
+| `POST` | `/management/{targetId}/resume` | Resume monitoring for a target → 202 |
+| `POST` | `/management/reload` | Reload all targets from config → 202 |
 
-Once running, access:
+**Debug endpoints** (requires `debug.controller.enabled: true`, base path `/api/debug`):
 
-- **Application**: http://localhost:8080
-- **Swagger UI**: http://localhost:8080/swagger-ui.html
-- **API Docs**: http://localhost:8080/api-docs
-- **Health Check**: http://localhost:8080/actuator/health
-- **Metrics**: http://localhost:8080/actuator/metrics
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/api/debug/execute/{targetId}` | Manually trigger a check |
+| `POST` | `/api/debug/execute/{notificationId}` | Delete a notification by ID (Long) |
+
+**Actuator** (always available):
+
+| Endpoint | Description |
+|----------|-------------|
+| `/actuator/health` | Liveness + readiness probes |
+| `/actuator/prometheus` | Prometheus metrics scrape |
+| `/actuator/metrics` | Spring metrics |
 
 ## Docker Images
 
-Available variants on [Docker Hub](https://hub.docker.com/r/wiserisk/hlabmonitor):
-
 ```bash
-# Ubuntu/Temurin (default)
-docker pull wiserisk/hlabmonitor:latest
-
-# Alpine (lightweight)
-docker pull wiserisk/hlabmonitor:latest-alpine
-
-# Amazon Corretto
-docker pull wiserisk/hlabmonitor:latest-corretto
+docker pull wiserisk/hlabmonitor:latest           # Ubuntu/Temurin (default)
+docker pull wiserisk/hlabmonitor:latest-alpine    # Alpine (smaller)
+docker pull wiserisk/hlabmonitor:latest-corretto  # Amazon Corretto
 ```
 
-## Support
+## Configuration Priority
 
-- 📖 [Documentation](docs/)
-- 🐛 [Issue Tracker](https://github.com/amaurydetremerie/HLabMonitor/issues)
-- 💬 [Discussions](https://github.com/amaurydetremerie/HLabMonitor/discussions)
+1. Environment variables (highest)
+2. File at `HLABMONITOR_CONFIG_LOCATION`
+3. `/etc/hlabmonitor/application.yaml`
+4. Embedded JAR defaults (lowest)
+
+## Requirements
+
+- **Java 21+** (for JAR deployments — Docker images include the JVM)
+- **Database** (optional): PostgreSQL, SQL Server, or SQLite — H2 in-memory is the default
 
 ## License
 
-This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
-
-See the [LICENSE](LICENSE) file for the full license text.
+GNU Affero General Public License v3.0 (AGPL-3.0). See [LICENSE](LICENSE).
 
 ## Contributing
 
-Contributions are welcome! See [CONTRIBUTING](docs/development/contributing.md) for guidelines.
+See [CONTRIBUTING](docs/development/contributing.md).
 
 ---
 
