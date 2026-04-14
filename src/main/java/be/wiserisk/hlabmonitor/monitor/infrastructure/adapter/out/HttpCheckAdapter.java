@@ -26,7 +26,6 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -205,7 +204,7 @@ public class HttpCheckAdapter implements CheckTargetPort {
     }
 
     private TargetResult checkSpeedThresholds(Target target, double speedMbps) {
-        String speedStr = String.format(Locale.US, "%.2f", speedMbps);
+        String speedStr = String.format("%.2f", speedMbps);
         if (speedMbps < target.failureThresholdMbps()) {
             return new TargetResult(target.id(), FAILURE,
                 "Download speed " + speedStr + " Mbps below failure threshold " + target.failureThresholdMbps() + " Mbps");
@@ -247,7 +246,7 @@ public class HttpCheckAdapter implements CheckTargetPort {
 
         if (!process.waitFor(timeoutSeconds, TimeUnit.SECONDS)) {
             process.destroyForcibly();
-            throw new TimeoutException("Process timed out after " + timeoutSeconds + " seconds: " + command.get(0));
+            throw new TimeoutException("Process timed out after " + timeoutSeconds + " seconds: " + command.getFirst());
         }
 
         stdoutThread.join(5000);

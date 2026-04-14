@@ -1,6 +1,7 @@
 package be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper;
 
 import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType;
+import be.wiserisk.hlabmonitor.monitor.domain.enums.SpeedtestType;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Target;
 import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.persistence.entity.TargetEntity;
@@ -55,6 +56,36 @@ class TargetMapperTest {
         assertThat(targetMapper.toDomain(targetEntity)).isNotNull()
                 .extracting("id", "type", "target")
                 .isEqualTo(List.of(new TargetId("targetId"), MonitoringType.UNKNOWN, "target"));
+    }
+
+    @Test
+    void mapSpeedtestTargetToEntity() {
+        Target target = new Target(new TargetId("home:ookla"), "", null, SpeedtestType.OOKLA, 500.0, 200.0);
+        TargetEntity entity = targetMapper.toEntity(target);
+        assertThat(entity.getSpeedtestType()).isEqualTo("OOKLA");
+        assertThat(entity.getWarningThresholdMbps()).isEqualTo(500.0);
+        assertThat(entity.getFailureThresholdMbps()).isEqualTo(200.0);
+    }
+
+    @Test
+    void mapEntityWithSpeedtestFieldsToDomain() {
+        TargetEntity entity = new TargetEntity(1L, "home:ookla", "", "SPEEDTEST", null, "OOKLA", 500.0, 200.0);
+        Target target = targetMapper.toDomain(entity);
+        assertThat(target.speedtestType()).isEqualTo(SpeedtestType.OOKLA);
+        assertThat(target.warningThresholdMbps()).isEqualTo(500.0);
+        assertThat(target.failureThresholdMbps()).isEqualTo(200.0);
+    }
+
+    @Test
+    void mapEntityWithUnknownSpeedtestTypeReturnsNull() {
+        TargetEntity entity = new TargetEntity(1L, "home:ookla", "", "SPEEDTEST", null, "INVALID_TYPE", null, null);
+        assertThat(targetMapper.toDomain(entity).speedtestType()).isNull();
+    }
+
+    @Test
+    void mapNullSpeedtestTypeToNullString() {
+        Target target = new Target(new TargetId("id"), MonitoringType.PING, "host", null);
+        assertThat(targetMapper.toEntity(target).getSpeedtestType()).isNull();
     }
 
 }

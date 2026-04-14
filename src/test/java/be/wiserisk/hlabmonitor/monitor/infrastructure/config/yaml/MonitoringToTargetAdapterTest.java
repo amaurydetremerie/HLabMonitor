@@ -2,10 +2,12 @@ package be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml;
 
 import be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringType;
 import be.wiserisk.hlabmonitor.monitor.domain.model.Target;
+import be.wiserisk.hlabmonitor.monitor.domain.enums.SpeedtestType;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.monitoring.Certificate;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.monitoring.Http;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.monitoring.MonitoringToTargetAdapter;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.monitoring.Ping;
+import be.wiserisk.hlabmonitor.monitor.infrastructure.config.yaml.monitoring.Speedtest;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -211,6 +213,67 @@ class MonitoringToTargetAdapterTest {
                     .filter(t -> t.type() == MonitoringType.HTTP)
                     .count();
             assertThat(httpCount).isEqualTo(2);
+        }
+    }
+
+    @Nested
+    class ExtractSpeedtestTargetsTests {
+
+        @Test
+        void shouldReturnEmptyWhenSpeedtestIsNull() {
+            List<Target> result = adapter.extractTargets(new Monitoring(null, null, null, null));
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        void shouldReturnEmptyWhenSpeedtestIsEmpty() {
+            List<Target> result = adapter.extractTargets(new Monitoring(null, null, Map.of(), null));
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        void shouldExtractOoklaSpeedtestTarget() {
+            Map<String, Speedtest> speedtests = new HashMap<>();
+            speedtests.put("home", new Speedtest("", Duration.ofHours(1), SpeedtestType.OOKLA, 500.0, 200.0));
+            Monitoring monitoring = new Monitoring(null, null, speedtests, null);
+
+            List<Target> result = adapter.extractTargets(monitoring);
+
+            assertThat(result).hasSize(1);
+            Target t = result.getFirst();
+            assertThat(t.type()).isEqualTo(MonitoringType.SPEEDTEST);
+            assertThat(t.id().id()).isEqualTo("home:ookla");
+            assertThat(t.speedtestType()).isEqualTo(SpeedtestType.OOKLA);
+            assertThat(t.warningThresholdMbps()).isEqualTo(500.0);
+            assertThat(t.failureThresholdMbps()).isEqualTo(200.0);
+        }
+
+        @Test
+        void shouldExtractLibreSpeedTarget() {
+            Map<String, Speedtest> speedtests = new HashMap<>();
+            speedtests.put("internal", new Speedtest("http://speedtest.local", Duration.ofHours(6), SpeedtestType.LIBRESPEED, 800.0, 400.0));
+            Monitoring monitoring = new Monitoring(null, null, speedtests, null);
+
+            List<Target> result = adapter.extractTargets(monitoring);
+
+            assertThat(result).hasSize(1);
+            assertThat(result.getFirst().id().id()).isEqualTo("internal:librespeed");
+            assertThat(result.getFirst().target()).isEqualTo("http://speedtest.local");
+        }
+
+        @Test
+        void shouldGenerateCorrectTargetIdForAllTypes() {
+            Map<String, Speedtest> speedtests = new HashMap<>();
+            speedtests.put("st1", new Speedtest("", Duration.ofHours(1), SpeedtestType.OOKLA, 500.0, 200.0));
+            speedtests.put("st2", new Speedtest("host", Duration.ofHours(1), SpeedtestType.IPERF, 500.0, 200.0));
+            speedtests.put("st3", new Speedtest("http://s", Duration.ofHours(1), SpeedtestType.LIBRESPEED, 500.0, 200.0));
+            speedtests.put("st4", new Speedtest("http://s", Duration.ofHours(1), SpeedtestType.OPENSPEEDTEST, 500.0, 200.0));
+            Monitoring monitoring = new Monitoring(null, null, speedtests, null);
+
+            List<Target> result = adapter.extractTargets(monitoring);
+
+            assertThat(result).extracting(t -> t.id().id())
+                    .containsExactlyInAnyOrder("st1:ookla", "st2:iperf", "st3:librespeed", "st4:openspeedtest");
         }
     }
 
