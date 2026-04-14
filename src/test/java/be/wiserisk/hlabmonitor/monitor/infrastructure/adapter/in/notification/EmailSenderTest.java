@@ -35,7 +35,7 @@ class EmailSenderTest {
     @Test
     void getNotificationType() {
         NotificationType notificationType = mock(NotificationType.class);
-        Monitoring monitoring = new Monitoring(null, null, new NotificationProperties(
+        Monitoring monitoring = new Monitoring(null, null, null, new NotificationProperties(
                 null, new NotificationEmail(
                 true, "null", null, notificationType, null), null, null, null));
         assertThat(emailSender.getNotificationType(monitoring)).isNotNull().isEqualTo(notificationType);

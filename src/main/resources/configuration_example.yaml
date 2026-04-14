@@ -30,3 +30,26 @@ monitoring:
     http-local:
       target: www.example.local
       ssl: false #Default true
+  speedtest:
+    home-gigabit:               # name → TargetId = home-gigabit:ookla
+      type: ookla               # ookla (default), librespeed, openspeedtest, iperf
+      # target: 12345           # Ookla: optional server ID (omit to use nearest server)
+      warning-threshold-mbps: 500   # Default: 500 Mbps
+      failure-threshold-mbps: 200   # Default: 200 Mbps
+      interval: 1h
+    internal-librespeed:        # TargetId = internal-librespeed:librespeed
+      type: librespeed
+      target: http://speedtest.internal   # Required: URL of your LibreSpeed server
+      warning-threshold-mbps: 800
+      failure-threshold-mbps: 400
+      interval: 6h
+    internal-openspeedtest:     # TargetId = internal-openspeedtest:openspeedtest
+      type: openspeedtest
+      target: http://openspeedtest.internal  # Required: URL of your OpenSpeedTest server
+      interval: 6h
+    internal-iperf:             # TargetId = internal-iperf:iperf
+      type: iperf
+      target: iperf.internal    # Required: hostname or IP of your iperf3 server
+      warning-threshold-mbps: 900
+      failure-threshold-mbps: 500
+      interval: 1h

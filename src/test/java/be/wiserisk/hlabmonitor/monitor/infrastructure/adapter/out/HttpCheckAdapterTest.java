@@ -5,6 +5,7 @@ import be.wiserisk.hlabmonitor.monitor.domain.model.TargetId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -47,10 +48,12 @@ class HttpCheckAdapterTest {
     private RestClient restClient;
     @Mock
     private RestClient internalRestClient;
+    @Mock
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setup() {
-        httpCheckAdapter = new HttpCheckAdapter(restClient, internalRestClient);
+        httpCheckAdapter = new HttpCheckAdapter(restClient, internalRestClient, objectMapper);
     }
 
     @Test

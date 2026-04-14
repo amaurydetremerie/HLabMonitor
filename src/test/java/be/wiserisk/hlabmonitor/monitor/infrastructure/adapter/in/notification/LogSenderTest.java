@@ -35,7 +35,7 @@ class LogSenderTest {
     void getNotificationType() {
         LogSender logSender = new LogSender(null);
         NotificationType notificationType = mock(NotificationType.class);
-        Monitoring monitoring = new Monitoring(null, null, new NotificationProperties(
+        Monitoring monitoring = new Monitoring(null, null, null, new NotificationProperties(
                 null, null, null, null, new NotificationLog(
                         true, null, notificationType)));
         assertThat(logSender.getNotificationType(monitoring)).isNotNull().isEqualTo(notificationType);

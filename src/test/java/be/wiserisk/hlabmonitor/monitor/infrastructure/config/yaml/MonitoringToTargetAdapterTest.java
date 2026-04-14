@@ -38,7 +38,7 @@ class MonitoringToTargetAdapterTest {
             Map<String, Ping> pings = new HashMap<>();
             pings.put("ping1", new Ping("192.168.1.1", Duration.ofSeconds(30)));
             pings.put("ping2", new Ping("google.com", Duration.ofMinutes(1)));
-            Monitoring monitoring = new Monitoring(pings, null, null);
+            Monitoring monitoring = new Monitoring(pings, null, null, null);
 
             List<Target> result = adapter.extractTargets(monitoring);
 
@@ -53,7 +53,7 @@ class MonitoringToTargetAdapterTest {
         void shouldExtractInternalHttpTargets() {
             Map<String, Http> https = new HashMap<>();
             https.put("http1", new Http("https://example.com", Duration.ofSeconds(60), false, null, null, true));
-            Monitoring monitoring = new Monitoring(null, https, null);
+            Monitoring monitoring = new Monitoring(null, https, null, null);
 
             List<Target> result = adapter.extractTargets(monitoring);
 
@@ -66,7 +66,7 @@ class MonitoringToTargetAdapterTest {
         void shouldExtractOnlyHttpTargets() {
             Map<String, Http> https = new HashMap<>();
             https.put("http1", new Http("https://example.com", Duration.ofSeconds(60), false, null, null, false));
-            Monitoring monitoring = new Monitoring(null, https, null);
+            Monitoring monitoring = new Monitoring(null, https, null, null);
 
             List<Target> result = adapter.extractTargets(monitoring);
 
@@ -80,7 +80,7 @@ class MonitoringToTargetAdapterTest {
             Certificate cert = new Certificate(Duration.ofDays(1));
             Map<String, Http> https = new HashMap<>();
             https.put("https1", new Http("https://secure.com", Duration.ofSeconds(60), true, cert, null, false));
-            Monitoring monitoring = new Monitoring(null, https, null);
+            Monitoring monitoring = new Monitoring(null, https, null, null);
 
             List<Target> result = adapter.extractTargets(monitoring);
 
@@ -100,7 +100,7 @@ class MonitoringToTargetAdapterTest {
             https.put("https1", new Http("https://secure.com", Duration.ofSeconds(60), true, cert, null, false));
             https.put("https2", new Http("https://secure.com", Duration.ofSeconds(60), true, null, null, false));
 
-            Monitoring monitoring = new Monitoring(pings, https, null);
+            Monitoring monitoring = new Monitoring(pings, https, null, null);
 
             List<Target> result = adapter.extractTargets(monitoring);
 
@@ -128,7 +128,7 @@ class MonitoringToTargetAdapterTest {
             Map<String, Http> https = new HashMap<>();
             https.put("https1", new Http("https://secure.com", httpInterval, true, cert, null, false));
 
-            Monitoring monitoring = new Monitoring(pings, https, null);
+            Monitoring monitoring = new Monitoring(pings, https, null, null);
 
             List<Target> result = adapter.extractTargets(monitoring);
 
@@ -167,7 +167,7 @@ class MonitoringToTargetAdapterTest {
 
         @Test
         void shouldReturnEmptyStreamWhenPingsIsEmpty() {
-            List<Target> result = adapter.extractTargets(new Monitoring(Map.of(), null, null));
+            List<Target> result = adapter.extractTargets(new Monitoring(Map.of(), null, null, null));
             assertThat(result).isEmpty();
         }
 
@@ -177,7 +177,7 @@ class MonitoringToTargetAdapterTest {
             pings.put("server1", new Ping("192.168.1.10", Duration.ofSeconds(15)));
             pings.put("server2", new Ping("10.0.0.1", Duration.ofMinutes(2)));
 
-            List<Target> result = adapter.extractTargets(new Monitoring(pings, null, null));
+            List<Target> result = adapter.extractTargets(new Monitoring(pings, null, null, null));
 
             assertThat(result).hasSize(2).allMatch(t -> t.type() == PING);
         }
@@ -194,7 +194,7 @@ class MonitoringToTargetAdapterTest {
 
         @Test
         void shouldReturnEmptyStreamWhenHttpsIsEmpty() {
-            List<Target> result = adapter.extractTargets(new Monitoring(null, Map.of(), null));
+            List<Target> result = adapter.extractTargets(new Monitoring(null, Map.of(), null, null));
             assertThat(result).isEmpty();
         }
 
@@ -204,7 +204,7 @@ class MonitoringToTargetAdapterTest {
             https.put("api1", new Http("https://api.example.com", Duration.ofSeconds(30), false, null, 302, false));
             https.put("api2", new Http("https://api2.example.com", Duration.ofMinutes(1), true, new Certificate(Duration.ofDays(1)), null, false));
 
-            Monitoring monitoring = new Monitoring(null, https, null);
+            Monitoring monitoring = new Monitoring(null, https, null, null);
             List<Target> result = adapter.extractTargets(monitoring);
 
             long httpCount = result.stream()
@@ -225,7 +225,7 @@ class MonitoringToTargetAdapterTest {
 
         @Test
         void shouldReturnEmptyStreamWhenHttpsIsEmpty() {
-            List<Target> result = adapter.extractTargets(new Monitoring(null, Map.of(), null));
+            List<Target> result = adapter.extractTargets(new Monitoring(null, Map.of(), null, null));
             assertThat(result).isEmpty();
         }
 
@@ -234,7 +234,7 @@ class MonitoringToTargetAdapterTest {
             Map<String, Http> https = new HashMap<>();
             https.put("http1", new Http("https://example.com", Duration.ofSeconds(60), false, null, null, false));
 
-            List<Target> result = adapter.extractTargets(new Monitoring(null, https, null));
+            List<Target> result = adapter.extractTargets(new Monitoring(null, https, null, null));
 
             assertThat(result).noneMatch(t -> t.type() == MonitoringType.CERTIFICATE);
         }
@@ -247,7 +247,7 @@ class MonitoringToTargetAdapterTest {
             https.put("https1", new Http("https://secure1.com", Duration.ofSeconds(60), true, cert, null, false));
             https.put("https2", new Http("https://secure2.com", Duration.ofSeconds(60), true, cert, null, false));
 
-            List<Target> result = adapter.extractTargets(new Monitoring(null, https, null));
+            List<Target> result = adapter.extractTargets(new Monitoring(null, https, null, null));
 
             long certCount = result.stream()
                     .filter(t -> t.type() == MonitoringType.CERTIFICATE)
@@ -261,7 +261,7 @@ class MonitoringToTargetAdapterTest {
             Map<String, Http> https = new HashMap<>();
             https.put("secure-api", new Http("https://secure.com", Duration.ofSeconds(60), true, cert, null, false));
 
-            List<Target> result = adapter.extractTargets(new Monitoring(null, https, null));
+            List<Target> result = adapter.extractTargets(new Monitoring(null, https, null, null));
 
             Target certTarget = result.stream()
                     .filter(t -> t.type() == MonitoringType.CERTIFICATE)
@@ -277,7 +277,7 @@ class MonitoringToTargetAdapterTest {
             Map<String, Http> https = new HashMap<>();
             https.put("https1", new Http("https://secure.com", Duration.ofSeconds(60), true, cert, null, false));
 
-            List<Target> result = adapter.extractTargets(new Monitoring(null, https, null));
+            List<Target> result = adapter.extractTargets(new Monitoring(null, https, null, null));
 
             Target certTarget = result.stream()
                     .filter(t -> t.type() == MonitoringType.CERTIFICATE)

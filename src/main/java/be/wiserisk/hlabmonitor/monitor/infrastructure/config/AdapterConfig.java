@@ -14,6 +14,7 @@ import be.wiserisk.hlabmonitor.monitor.infrastructure.adapter.out.scheduler.Sche
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper.NotificationMapper;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper.ResultMapper;
 import be.wiserisk.hlabmonitor.monitor.infrastructure.config.mapper.TargetMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
@@ -32,9 +33,10 @@ public class AdapterConfig {
     @Bean
     public CheckTargetPort checkTargetPort(
             RestClient restClient,
-            RestClient internalRestClient) {
+            RestClient internalRestClient,
+            ObjectMapper objectMapper) {
         return new HttpCheckAdapter(
-                restClient, internalRestClient);
+                restClient, internalRestClient, objectMapper);
     }
 
     @Bean

@@ -5,3 +5,6 @@ monitoring:
   http:
     http-1:
       target: www.example.com
+  speedtest:
+    speedtest-1:
+      type: ookla

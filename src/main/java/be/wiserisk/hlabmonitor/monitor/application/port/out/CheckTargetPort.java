@@ -7,4 +7,5 @@ public interface CheckTargetPort {
     TargetResult ping(Target target);
     TargetResult httpCheck(Target target);
     TargetResult certCheck(Target target);
+    TargetResult speedtestCheck(Target target);
 }

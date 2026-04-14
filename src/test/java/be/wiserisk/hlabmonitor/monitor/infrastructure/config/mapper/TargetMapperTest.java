@@ -18,31 +18,43 @@ class TargetMapperTest {
     @Test
     void mapTargetToTargetEntity() {
         Target target = new Target(new TargetId("targetId"), MonitoringType.HTTP, "target", Duration.ofMinutes(1));
-        assertThat(targetMapper.toEntity(target)).isNotNull().hasNoNullFieldsOrPropertiesExcept("id").extracting("targetId", "type", "target").isEqualTo(List.of("targetId", "HTTP", "target"));
+        assertThat(targetMapper.toEntity(target)).isNotNull()
+                .hasNoNullFieldsOrPropertiesExcept("id", "speedtestType", "warningThresholdMbps", "failureThresholdMbps")
+                .extracting("targetId", "type", "target")
+                .isEqualTo(List.of("targetId", "HTTP", "target"));
     }
 
     @Test
     void mapTargetToTargetEntityTypeNull() {
         Target target = new Target(new TargetId("targetId"), null, "target", Duration.ofMinutes(1));
-        assertThat(targetMapper.toEntity(target)).isNotNull().hasNoNullFieldsOrPropertiesExcept("id", "type").extracting("targetId", "target").isEqualTo(List.of("targetId", "target"));
+        assertThat(targetMapper.toEntity(target)).isNotNull()
+                .hasNoNullFieldsOrPropertiesExcept("id", "type", "speedtestType", "warningThresholdMbps", "failureThresholdMbps")
+                .extracting("targetId", "target")
+                .isEqualTo(List.of("targetId", "target"));
     }
 
     @Test
     void mapTargetEntityToTarget() {
-        TargetEntity targetEntity = new TargetEntity(1L, "targetId", "target", "HTTP", 302);
-        assertThat(targetMapper.toDomain(targetEntity)).isNotNull().extracting("id", "type", "target", "acceptableStatusCode").isEqualTo(List.of(new TargetId("targetId"), MonitoringType.HTTP, "target", 302));
+        TargetEntity targetEntity = new TargetEntity(1L, "targetId", "target", "HTTP", 302, null, null, null);
+        assertThat(targetMapper.toDomain(targetEntity)).isNotNull()
+                .extracting("id", "type", "target", "acceptableStatusCode")
+                .isEqualTo(List.of(new TargetId("targetId"), MonitoringType.HTTP, "target", 302));
     }
 
     @Test
     void mapTargetEntityToTargetTypeNull() {
-        TargetEntity targetEntity = new TargetEntity(1L, "targetId", "target", null, null);
-        assertThat(targetMapper.toDomain(targetEntity)).isNotNull().extracting("id", "type", "target").isEqualTo(List.of(new TargetId("targetId"), MonitoringType.UNKNOWN, "target"));
+        TargetEntity targetEntity = new TargetEntity(1L, "targetId", "target", null, null, null, null, null);
+        assertThat(targetMapper.toDomain(targetEntity)).isNotNull()
+                .extracting("id", "type", "target")
+                .isEqualTo(List.of(new TargetId("targetId"), MonitoringType.UNKNOWN, "target"));
     }
 
     @Test
     void mapTargetEntityToTargetTypeRandom() {
-        TargetEntity targetEntity = new TargetEntity(1L, "targetId", "target", "RANDOM", null);
-        assertThat(targetMapper.toDomain(targetEntity)).isNotNull().extracting("id", "type", "target").isEqualTo(List.of(new TargetId("targetId"), MonitoringType.UNKNOWN, "target"));
+        TargetEntity targetEntity = new TargetEntity(1L, "targetId", "target", "RANDOM", null, null, null, null);
+        assertThat(targetMapper.toDomain(targetEntity)).isNotNull()
+                .extracting("id", "type", "target")
+                .isEqualTo(List.of(new TargetId("targetId"), MonitoringType.UNKNOWN, "target"));
     }
 
 }

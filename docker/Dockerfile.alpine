@@ -6,6 +6,8 @@ EXPOSE 5005
 RUN mkdir -p /etc/hlabmonitor /var/lib/hlabmonitor /var/log/hlabmonitor && \
     chown -R 1001:1001 /etc/hlabmonitor /var/lib/hlabmonitor /var/log/hlabmonitor
 
+RUN apk add --no-cache iperf3
+
 COPY target/*.jar /opt/app/app.jar
 COPY docker/entrypoint.sh /opt/app/entrypoint.sh
 

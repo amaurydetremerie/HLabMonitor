@@ -30,7 +30,7 @@ public class MonitoringService implements ExecuteCheckUseCase {
             case PING -> pingTarget(target);
             case HTTP, HTTP_INTERNAL -> getTarget(target);
             case CERTIFICATE -> verifyCert(target);
-            case SPEEDTEST -> throw new UnsupportedOperationException("Not supported yet.");
+            case SPEEDTEST -> speedtestTarget(target);
             default -> throw new UnsupportedEnumException(target.type());
         };
     }
@@ -49,5 +49,9 @@ public class MonitoringService implements ExecuteCheckUseCase {
 
     private TargetResult verifyCert(Target target) {
         return checkPort.certCheck(target);
+    }
+
+    private TargetResult speedtestTarget(Target target) {
+        return checkPort.speedtestCheck(target);
     }
 }

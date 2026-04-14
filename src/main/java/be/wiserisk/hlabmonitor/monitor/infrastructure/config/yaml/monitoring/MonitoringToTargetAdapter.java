@@ -15,7 +15,8 @@ public class MonitoringToTargetAdapter {
         return Stream.of(
                         extractPingTargets(monitoring.getPing()),
                         extractHttpTargets(monitoring.getHttp()),
-                        extractCertificateTargets(monitoring.getHttp())
+                        extractCertificateTargets(monitoring.getHttp()),
+                        extractSpeedtestTargets(monitoring.getSpeedtest())
                 )
                 .flatMap(Function.identity())
                 .toList();
@@ -60,6 +61,22 @@ public class MonitoringToTargetAdapter {
                         MonitoringType.CERTIFICATE,
                         entry.getValue().target(),
                         entry.getValue().certificate().interval()
+                ));
+    }
+
+    private Stream<Target> extractSpeedtestTargets(Map<String, Speedtest> speedtests) {
+        if (speedtests == null || speedtests.isEmpty()) {
+            return Stream.empty();
+        }
+        return speedtests.entrySet().stream()
+                .map(entry ->
+                        new Target(
+                            new TargetId(entry.getKey() + ":" + entry.getValue().type().name().toLowerCase()),
+                            entry.getValue().target(),
+                            entry.getValue().interval(),
+                            entry.getValue().type(),
+                            entry.getValue().warningThresholdMbps(),
+                            entry.getValue().failureThresholdMbps()
                 ));
     }
 }

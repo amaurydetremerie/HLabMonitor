@@ -48,3 +48,41 @@ databaseChangeLog:
         - dropColumn:
             tableName: TARGET
             columnName: acceptable_status_code
+  - changeSet:
+      id: 7-add-speedtest-columns
+      author: adetremerie
+      changes:
+        - addColumn:
+            tableName: TARGET
+            columns:
+              - column:
+                  name: speedtest_type
+                  type: varchar(50)
+                  constraints:
+                    nullable: true
+        - addColumn:
+            tableName: TARGET
+            columns:
+              - column:
+                  name: warning_threshold_mbps
+                  type: decimal(10,3)
+                  constraints:
+                    nullable: true
+        - addColumn:
+            tableName: TARGET
+            columns:
+              - column:
+                  name: failure_threshold_mbps
+                  type: decimal(10,3)
+                  constraints:
+                    nullable: true
+      rollback:
+        - dropColumn:
+            tableName: TARGET
+            columnName: speedtest_type
+        - dropColumn:
+            tableName: TARGET
+            columnName: warning_threshold_mbps
+        - dropColumn:
+            tableName: TARGET
+            columnName: failure_threshold_mbps

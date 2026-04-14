@@ -89,11 +89,15 @@ class MonitoringServiceTest {
 
     @Test
     void executeCheckSpeedTest() {
+        TargetResult targetResult = new TargetResult(TARGET_ID, SUCCESS, "");
         Target target = new Target(TARGET_ID, SPEEDTEST, TARGET, Duration.ofMinutes(1));
 
         when(persistencePort.getTarget(TARGET_ID)).thenReturn(target);
+        when(checkPort.speedtestCheck(target)).thenReturn(targetResult);
+        when(persistencePort.saveResult(targetResult)).thenReturn(targetResult);
 
-        assertThrows(UnsupportedOperationException.class, () -> monitoringService.executeCheck(TARGET_ID));
+        assertDoesNotThrow(() -> monitoringService.executeCheck(TARGET_ID));
+        verify(executeNotificationUseCase, times(1)).handleNotification(targetResult);
     }
 
     @Test

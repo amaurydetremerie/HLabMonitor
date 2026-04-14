@@ -6,6 +6,13 @@ EXPOSE 5005
 RUN mkdir -p /etc/hlabmonitor /var/lib/hlabmonitor /var/log/hlabmonitor && \
     chown -R 1001:1001 /etc/hlabmonitor /var/lib/hlabmonitor /var/log/hlabmonitor
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl gnupg && \
+    curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | bash && \
+    apt-get install -y --no-install-recommends iperf3 speedtest && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY target/*.jar /opt/app/app.jar
 COPY docker/entrypoint.sh /opt/app/entrypoint.sh
 

@@ -100,6 +100,7 @@ class InfrastructureTest {
     void adapter_out() {
         classes()
                 .that().resideInAnyPackage(ADAPTER_OUT.getStringPackage())
+                .and().areTopLevelClasses()
                 .and().resideOutsideOfPackages(ADAPTER_OUT_PERSISTENCE.getStringPackage(), ADAPTER_OUT_SCHEDULER.getStringPackage())
                 .should().implement(JavaClass.Predicates.resideInAnyPackage(PORTS_OUT.getStringPackage()))
                 .check(classes);

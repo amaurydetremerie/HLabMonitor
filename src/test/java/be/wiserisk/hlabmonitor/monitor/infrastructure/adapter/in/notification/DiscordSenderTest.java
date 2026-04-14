@@ -41,7 +41,7 @@ class DiscordSenderTest {
     @Test
     void getNotificationType() {
         NotificationType notificationType = mock(NotificationType.class);
-        Monitoring monitoring = new Monitoring(null, null, new NotificationProperties(
+        Monitoring monitoring = new Monitoring(null, null, null, new NotificationProperties(
                 null, null, new NotificationDiscord(
                 true, null, notificationType), null, null));
         assertThat(discordSender.getNotificationType(monitoring)).isNotNull().isEqualTo(notificationType);

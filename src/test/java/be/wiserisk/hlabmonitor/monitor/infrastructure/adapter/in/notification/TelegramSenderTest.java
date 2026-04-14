@@ -34,7 +34,7 @@ class TelegramSenderTest {
     void getNotificationType() {
         TelegramSender telegramSender = new TelegramSender(null, null, null);
         NotificationType notificationType = mock(NotificationType.class);
-        Monitoring monitoring = new Monitoring(null, null, new NotificationProperties(
+        Monitoring monitoring = new Monitoring(null, null, null, new NotificationProperties(
                 null, null, null, new NotificationTelegram(
                 true, null, null, notificationType), null));
         assertThat(telegramSender.getNotificationType(monitoring)).isNotNull().isEqualTo(notificationType);

@@ -25,4 +25,11 @@ public class TargetEntity {
     private String type;
     @Column(name = "acceptable_status_code")
     private Integer acceptableStatusCode;
+
+    @Column(name = "speedtest_type")
+    private String speedtestType;
+    @Column(name = "warning_threshold_mbps")
+    private Double warningThresholdMbps;
+    @Column(name = "failure_threshold_mbps")
+    private Double failureThresholdMbps;
 }
