@@ -507,7 +507,7 @@ class HttpCheckAdapterTest {
         }
 
         @Test
-        void ooklaNotInstalled() throws Exception {
+        void ooklaNotInstalled() {
             try (MockedConstruction<ProcessBuilder> ignored = mockConstruction(ProcessBuilder.class,
                     (pb, ctx) -> when(pb.start()).thenThrow(new IOException("No such file or directory")))) {
                 assertThat(speedtestAdapter.speedtestCheck(speedtestTarget(SpeedtestType.OOKLA, "")))
@@ -554,7 +554,7 @@ class HttpCheckAdapterTest {
         }
 
         @Test
-        void iperfNotInstalled() throws Exception {
+        void iperfNotInstalled() {
             try (MockedConstruction<ProcessBuilder> ignored = mockConstruction(ProcessBuilder.class,
                     (pb, ctx) -> when(pb.start()).thenThrow(new IOException("No such file or directory")))) {
                 assertThat(speedtestAdapter.speedtestCheck(speedtestTarget(SpeedtestType.IPERF, "iperf.host")))

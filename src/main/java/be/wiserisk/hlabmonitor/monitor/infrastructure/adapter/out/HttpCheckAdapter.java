@@ -34,6 +34,7 @@ import static be.wiserisk.hlabmonitor.monitor.domain.enums.MonitoringResult.*;
 @AllArgsConstructor
 public class HttpCheckAdapter implements CheckTargetPort {
 
+    public static final String MBPS = " Mbps";
     private final RestClient restClient;
     private final RestClient internalRestClient;
     private final ObjectMapper objectMapper;
@@ -207,13 +208,13 @@ public class HttpCheckAdapter implements CheckTargetPort {
         String speedStr = String.format("%.2f", speedMbps);
         if (speedMbps < target.failureThresholdMbps()) {
             return new TargetResult(target.id(), FAILURE,
-                "Download speed " + speedStr + " Mbps below failure threshold " + target.failureThresholdMbps() + " Mbps");
+                "Download speed " + speedStr + " Mbps below failure threshold " + target.failureThresholdMbps() + MBPS);
         }
         if (speedMbps < target.warningThresholdMbps()) {
             return new TargetResult(target.id(), WARNING,
-                "Download speed " + speedStr + " Mbps below warning threshold " + target.warningThresholdMbps() + " Mbps");
+                "Download speed " + speedStr + " Mbps below warning threshold " + target.warningThresholdMbps() + MBPS);
         }
-        return new TargetResult(target.id(), SUCCESS, "Download speed: " + speedStr + " Mbps");
+        return new TargetResult(target.id(), SUCCESS, "Download speed: " + speedStr + MBPS);
     }
 
     /**
@@ -232,7 +233,7 @@ public class HttpCheckAdapter implements CheckTargetPort {
                 while ((line = reader.readLine()) != null) {
                     stdout.append(line).append('\n');
                 }
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {/*Ignored*/}
         });
 
         Thread stderrThread = Thread.ofVirtual().start(() -> {
@@ -241,7 +242,7 @@ public class HttpCheckAdapter implements CheckTargetPort {
                 while ((line = reader.readLine()) != null) {
                     stderr.append(line).append('\n');
                 }
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {/*Ignored*/}
         });
 
         if (!process.waitFor(timeoutSeconds, TimeUnit.SECONDS)) {
